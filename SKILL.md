@@ -110,6 +110,8 @@ Deliver `song.abc` when:
 4. **Motif:** state a 4–6 note cell, then repeat it with `vary:end-`, `+oct`, or `shift:<n>`; avoid literal copies.
 5. **Arc and rhythm:** start the verse low, lift the ajuz 4–7 semitones, save an octave for one climax. Hold key words and line endings; keep `:.25` turns rare.
 
+**Maqam:** Kurd on D uses `b2`, `b3`, `b6`, `b7`, and cadences on `1`, `4`, `5`; if MAQAM fit is below 80%, a natural `2`/`3` probably replaced `b2`/`b3` (`references/maqam.md`).
+
 ## Corpus
 
 Medians: 149 bars, 93 BPM, 14 st vocal span, 1.17 onsets/beat, .45 rest, +1 st
