@@ -97,13 +97,18 @@ A complete working example: `assets/example_blueprint.json` with
       {"ch": "A",  "ins": "R1 +oct"}
     ]},
     {"id": "v1", "kind": "verse", "bars": [
-      {"ch": "Dm", "syl": "@verse_1.L1:1-5",
-       "voc": "1:.5 b2:.5 1:.5 b7-:.5 1:2", "ins": "rest"},
-      {"ch": "Gm", "syl": "@verse_1.L1:6-9",
-       "voc": "4:.5 b3:.5 (b2:.25 1:.25 b2:.5) 1:1 r:1", "ins": "rest"}
+      {"ch": "Dm", "syl": "@verse_1.L1:1-4",
+       "voc": "1:.5 b2:.5 1:2 b3:1", "ins": "rest"},
+      {"ch": "Gm", "syl": "@verse_1.L1:5-8",
+       "voc": "b3:.5 4:.5 4:1 b2:2", "ins": "1:4"},
+      {"ch": "Bb", "syl": "@verse_1.L1:9-12",
+       "voc": "1:.5 b2:.5 1:1 b3:2", "ins": "rest"},
+      {"ch": "A", "syl": "@verse_1.L1:13-16",
+       "voc": "b2:.5 1:.5 b3:1 r:2", "ins": "r:2 5:2"}
     ]},
     {"id": "c1", "kind": "chorus", "same_as": "v1",
-     "syl": ["@chorus.L1:1-5", "@chorus.L1:6-9"]}
+     "syl": ["@chorus.L1:1-4", "@chorus.L1:5-8",
+             "@chorus.L1:9-12", "@chorus.L1:13-16"]}
   ]
 }
 ```
