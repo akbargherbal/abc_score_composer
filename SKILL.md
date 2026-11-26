@@ -19,9 +19,9 @@ Blueprint; Python does the notation math and validation. Never hand-write ABC.
 
 **Loop:** `intake -> Blueprint -> compile -> inspect -> patch Blueprint -> release`
 
-At most **2 musical patch rounds** after the first clean compile. Authoring
+At most **1 musical patch round** after the first clean compile. Authoring
 fixes (a syllable range, an octave slip) are not musical rounds. If the same
-structural problem survives two rounds, stop and report it.
+structural problem survives one round, stop and report it.
 
 ## 1. Intake
 
@@ -78,7 +78,7 @@ Compile writes `song.abc` when bar sums and voice alignment pass.
 `--strict` requires `syl` on every vocal bar. The delivered ABC has no `w:`
 lines. A verse that is not whole bayts fails with `bad_verse_bars`; the
 compiler also inserts the missing breath (`r:1.5` after a sadr, `r:2` after an
-ajuz). The card is one line on success; `--verbose` prints the
+ajuz). Card: one line on success; `--verbose` prints the
 corpus card.
 
 - `ERRORS` are structural (`bar_sum`, `syl_mismatch`, `bad_chord`, `range`,
@@ -101,7 +101,7 @@ appears).
 Deliver `song.abc` when:
 
 - `abc2midi` reports **0 errors and 0 warnings**;
-- every bar sums and both voices have the same bar count;
+- every bar sums, both voices align, and every pitch is in range;
 - `syl` covers the vocal bars and no intake line is unused;
 - CRAFT is advisory: mention any flag, do not chase it;
 - the chorus is above the verse and the vocal span fits one singer;
