@@ -1,5 +1,5 @@
 {
-  "version": "0.2.1",
+  "version": "0.2.2",
   "status": "provisional",
   "why": "The corpus has no lyrics, so it cannot measure text-setting. These four checks are calibrated on one singable score (excellent.txt) and three scores with the reported aimless-scalar defect (07, 11, 16). They are advisory, not corpus percentiles.",
   "calibration": {

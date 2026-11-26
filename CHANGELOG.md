@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.2
+
+- The agent now writes only `fill.json`: a compact `meta`/`motifs` plus one
+  `[voc, ins]` row per skeleton bar. `compile_abc.py --skeleton sk --fill fill`
+  merges it and rejects unknown, missing, wrong-length, or `same_as` sections.
+- `intake_lyrics.py` writes the skeleton compactly: 2,853 B → 1,352 B for the
+  example (47%). `agent_write_B` drops from 3,444 B (full Blueprint) to
+  1,241 B (fill) and is now measured by `scripts/measure_footprint.py`.
+- CRAFT adds one metric: verse phrase-median range must be at least 12
+  semitones. The example is 12; the fixtures are 18 (excellent) and 6/10/3
+  (07/11/16), so only the defective scores get `register flat`.
+- SKILL.md gains a one-line maqam identity note: Kurd `b2/b3/b6/b7`, cadences
+  on `1/4/5`, and natural `2/3` when MAQAM fit falls below 80%.
+- The compact card prints abc2midi errors first, then ERRORS/WARNINGS, then
+  CRAFT flags, so a failed render cannot hide a prosody flag.
+- Correction: the earlier full-prompt token estimate counted only `voc/ins`,
+  not the whole agent output. `agent_write_B` is the reproducible metric.
+- Footprint: SKILL 5,808 B; mandatory reading 26,468 B; example 1,352 B
+  skeleton + 1,241 B fill; success card 13 words; failure card 32 words.
+- Tests: 14 pass with abc2midi; 0 skipped.
+
 ## 0.2.1
 
 - Leaner footprint without dropping a prosody rule.

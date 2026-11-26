@@ -1,6 +1,6 @@
 ---
 name: abc-score-writer
-version: "0.2.1"
+version: "0.2.2"
 description: >-
   Compose a complete SheetSage2-style two-voice ABC score from Arabic lyrics
   and a style prompt (Arabic maqam, tarab, symphonic metal, etc.). The model
@@ -79,8 +79,8 @@ corpus card.
 - `ERRORS` are structural (`bar_sum`, `syl_mismatch`, `bad_chord`, `range`,
   `grid`, `bad_motif`, `bad_verse_bars`). Fix the Blueprint and recompile.
 - `FLAGS` are corpus extremes/target misses; musical, not syntax.
-- `CRAFT` checks line length, breath, cadence, and long-note share. Advisory
-  unless `meta.targets.craft` is true and you pass `--strict`.
+- `CRAFT` checks line length, breath, cadence, long-note share, and register
+  range. Advisory unless `meta.targets.craft` is true and you pass `--strict`.
 - Any `abc2midi` `Error`/`Warning` is a hard failure.
 
 ## 4. Patch the Blueprint, not the ABC
