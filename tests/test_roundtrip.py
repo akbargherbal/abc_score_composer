@@ -253,6 +253,20 @@ class SkeletonTests(unittest.TestCase):
             skel_text = f.read()
         self.assertEqual(full_text, skel_text)
 
+    def test_skeleton_plus_fill_matches_example_abc(self):
+        tmp = tempfile.mkdtemp(prefix="abc_fill_")
+        abc = os.path.join(tmp, "song.abc")
+        run([os.path.join(SCRIPTS, "compile_abc.py"),
+             "--skeleton", os.path.join(ASSETS, "example_blueprint_skeleton.json"),
+             "--fill", os.path.join(ASSETS, "example_fill.json"),
+             "-o", abc, "--intake", os.path.join(ASSETS, "example_intake.json"),
+             "--strict"], check=True)
+        with open(abc, encoding="utf-8") as f:
+            got = f.read()
+        with open(os.path.join(ASSETS, "example_song.abc"), encoding="utf-8") as f:
+            want = f.read()
+        self.assertEqual(got, want)
+
     def test_verse_bar_count_is_rejected(self):
         tmp = tempfile.mkdtemp(prefix="abc_verse_")
         bp = {

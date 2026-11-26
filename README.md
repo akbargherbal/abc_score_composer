@@ -11,10 +11,10 @@ patch-by-patch workflow. The old architecture mixed composition with notation
 repair; this one separates them: the model composes, the compiler and
 inspector measure, and the model patches the Blueprint rather than the ABC.
 
-Version 0.2.0 adds the missing **vocal craft** layer. The corpus can measure a
+Version 0.2.x adds the missing **vocal craft** layer. The corpus can measure a
 transcription, but it has no lyrics, so it cannot tell whether a tune follows
-the words. The new `CRAFT` check measures phrase length, cadence, breath,
-register arc, long/fast note balance, and motif reuse. It is calibrated on four
+the words. `CRAFT` checks shatr/bayt length, breath, sadr/ajuz cadence, and
+long-note share. It is calibrated on four
 hand-labelled scores: one singable (`tests/fixtures/excellent.txt`) and three
 with the aimless-scalar defect (`07`, `11`, `16`). The rules, terminology, and
 a worked eight-bar bayt are in `references/vocal_craft.md`.
@@ -25,7 +25,8 @@ a worked eight-bar bayt are in `references/vocal_craft.md`.
 python3 scripts/intake_lyrics.py --in prompt.txt -o intake.json \
   --skeleton blueprint_skeleton.json
 
-python3 scripts/compile_abc.py blueprint_skeleton.json -o song.abc \
+python3 scripts/compile_abc.py \
+  --skeleton blueprint_skeleton.json --fill fill.json -o song.abc \
   --intake intake.json --report song.report.json \
   --validation-out song.validation.abc --strict
 
@@ -34,8 +35,9 @@ python3 scripts/validate_and_inspect.py song.abc \
   --abc2midi /path/to/abc2midi
 ```
 
-Fill only `voc` and `ins` in the skeleton; `ch` and `syl` are already there.
-The inspector prints one line on success; add `--verbose` for the full card.
+Write only `voc`/`ins` rows in `fill.json`; `ch` and `syl` stay in the
+skeleton. The inspector prints one line on success; add `--verbose` for the
+full card.
 
 The delivered `song.abc` mirrors the corpus: `V: Vocal` + `V: Ins`, no `w:`
 lyrics, 4-bar voice blocks, chord symbols on the vocal, `Z` for silent bars.

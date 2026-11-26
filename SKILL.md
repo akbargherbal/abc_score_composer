@@ -39,34 +39,29 @@ role comes from a trailing `...`, otherwise it alternates. Arabic with
 ranges, including `same_as` for a repeated chorus. **Fill only `voc` and `ins`.**
 Do not retype `ch` or `syl`.
 
-## 2. Write the Blueprint
+## 2. Write `fill.json`
 
-One JSON file, starting from the skeleton. Think register, rhythm, melisma, and
-call-and-response. Do not write ABC, do bar arithmetic, or compute pitches by
-hand.
+Write one compact fill file, not a full Blueprint:
 
-Full schema and error codes: `references/blueprint_schema.md`. Working example:
-`assets/example_blueprint.json` with its skeleton, intake, and compiled ABC.
+```json
+{"meta":{},"motifs":{"R1":{"ins":"1:.5 b2:.5 1:2"}},
+ "fill":{"verse_1":[["1:1 b2:1 1:2","rest"],["4:1 b3:1 4:2","1:4"]]}}
+```
 
-
-- `meta.key` is plain major/minor (`Dm`, `F#`); the maqam is a label and the
-  degrees decide pitches. `vocal_octave`/`instrument_octave` shift a voice.
-- Each bar has `ch`, `voc`, `syl`, `ins`. `syl` is one token per sung group;
-  `@line:start-end` pulls intake syllables, and `(a b c)` is one melisma group.
-- Use `same_as` for a repeated chorus/outro and `{"from": "v1", "take": [0]}` to
-  reuse a bar. `voc_shift`/`ins_shift` transpose by semitones.
-- `rest` fills a bar; `r:<beats>` is a timed rest. `meta.targets.craft: true`
-  makes CRAFT flags a hard failure under `--strict`.
+Only `voc`/`ins`, one `[voc, ins]` pair per skeleton bar, in section order. Do
+not fill a `same_as` section; it copies its source. `meta`/`motifs` are
+optional. `rest` fills a bar; `r:<beats>` is a timed rest.
 
 **Note grammar:** `degree:beats`. Degrees `1,b2,2,b3,3,4,b5,5,b6,6,b7,7`
-(also `#4`). Trailing `+`/`-` shift octaves; `7` is the leading tone above the
-tonic. Durations are quarter-note beats (`0.25`, `0.5`, `1`, `2`); trailing `~`
-ties to the next note.
+(also `#4`). Trailing `+`/`-` shift octaves. Durations are quarter-note beats
+(`0.25`, `0.5`, `1`, `2`); trailing `~` ties to the next note. Full schema,
+`same_as`, and all error codes: `references/blueprint_schema.md`.
 
 ## 3. Compile and inspect
 
 ```bash
-python3 <skill>/scripts/compile_abc.py blueprint.json -o song.abc \
+python3 <skill>/scripts/compile_abc.py \
+  --skeleton blueprint_skeleton.json --fill fill.json -o song.abc \
   --intake intake.json --report song.report.json \
   --validation-out song.validation.abc --strict
 

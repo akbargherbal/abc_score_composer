@@ -163,6 +163,12 @@ line of eight syllables or fewer). For a repeated section named exactly the
 same (`Chorus`, `Chorus`), the later one uses `same_as` and a new `syl` list.
 Fill only `voc` and `ins`; the compiler adds a missing breath rest.
 
+### Fill
+
+`compile_abc.py --skeleton sk.json --fill fill.json` takes `fill[section]` as
+one `[voc, ins]` row per skeleton bar, in order. `same_as` sections are copied
+and must not appear. `meta`/`motifs` are optional.
+
 ## Report line map
 
 The compiler report carries a `line_map` list. It does not change the ABC and

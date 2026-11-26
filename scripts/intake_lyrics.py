@@ -516,7 +516,9 @@ def main() -> int:
         os.path.dirname(os.path.abspath(args.out)), "blueprint_skeleton.json")
     skeleton = build_skeleton(out)
     with open(skeleton_path, "w", encoding="utf-8") as f:
-        json.dump(skeleton, f, ensure_ascii=False, indent=2, sort_keys=False)
+        # The skeleton is machine-read; compact JSON keeps the agent's context
+        # small while staying valid and easy to diff by section.
+        json.dump(skeleton, f, ensure_ascii=False, separators=(",", ":"))
         f.write("\n")
 
     if args.json:

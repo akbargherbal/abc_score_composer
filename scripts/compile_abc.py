@@ -512,6 +512,71 @@ def resolve_syllables(syl, line_map: dict, used: dict | None = None) -> list[str
 
 
 # ---------------------------------------------------------------------------
+# Fill merge
+# ---------------------------------------------------------------------------
+
+def merge_fill(skeleton: dict, fill: dict) -> dict:
+    """Merge a compact ``fill.json`` into a generated skeleton.
+
+    The skeleton owns meta, sections, bars, chords, and syl ranges.  The fill
+    owns only the musical strings, one [voc, ins] pair per bar in section
+    order.  A ``same_as`` section is filled from its source and must not appear
+    in the fill.
+    """
+    merged = copy.deepcopy(skeleton)
+    fill_meta = fill.get("meta") or {}
+    if fill_meta:
+        merged.setdefault("meta", {})
+        for key, value in fill_meta.items():
+            if key == "targets" and isinstance(value, dict):
+                merged["meta"].setdefault("targets", {}).update(value)
+            else:
+                merged["meta"][key] = value
+    if "motifs" in fill:
+        merged["motifs"] = fill["motifs"] or {}
+
+    rows_by_section = fill.get("fill")
+    if not isinstance(rows_by_section, dict):
+        raise CompileError("bad_fill", "fill.json needs a 'fill' object keyed by section")
+    sections = merged.get("sections") or []
+    known = {s.get("id") for s in sections}
+    unknown = [sid for sid in rows_by_section if sid not in known]
+    if unknown:
+        raise CompileError("bad_fill", f"unknown section(s) in fill: {', '.join(unknown)}")
+
+    for sec in sections:
+        sid = sec.get("id")
+        if sec.get("same_as"):
+            if sid in rows_by_section:
+                raise CompileError(
+                    "bad_fill",
+                    f"section {sid!r} uses same_as {sec['same_as']!r}; "
+                    f"fill the source section instead",
+                )
+            continue
+        if sid not in rows_by_section:
+            raise CompileError("bad_fill", f"missing section {sid!r} in fill")
+        rows = rows_by_section[sid]
+        bars = sec.get("bars") or []
+        if not isinstance(rows, list) or len(rows) != len(bars):
+            got = len(rows) if isinstance(rows, list) else "not a list"
+            raise CompileError(
+                "bad_fill",
+                f"section {sid!r} needs {len(bars)} [voc,ins] rows, got {got}",
+            )
+        for i, row in enumerate(rows):
+            if not isinstance(row, (list, tuple)) or len(row) != 2:
+                raise CompileError(
+                    "bad_fill",
+                    f"section {sid!r} bar {i + 1} must be [voc, ins]",
+                )
+            voc, ins = row
+            bars[i]["voc"] = "rest" if voc in (None, "") else str(voc)
+            bars[i]["ins"] = "rest" if ins in (None, "") else str(ins)
+    return merged
+
+
+# ---------------------------------------------------------------------------
 # Compilation
 # ---------------------------------------------------------------------------
 
@@ -1028,11 +1093,15 @@ def compile_blueprint(bp: dict, intake: dict | None = None, strict: bool = False
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("blueprint")
+    ap.add_argument("blueprint", nargs="?", default=None)
     ap.add_argument("-o", "--out", required=True)
     ap.add_argument("--report", default=None)
     ap.add_argument("--validation-out", default=None)
     ap.add_argument("--intake", default=None)
+    ap.add_argument("--skeleton", default=None,
+                    help="generated blueprint_skeleton.json")
+    ap.add_argument("--fill", default=None,
+                    help="fill.json with only voc/ins rows")
     ap.add_argument("--strict", action="store_true",
                     help="require syl on every vocal bar")
     ap.add_argument("--json", action="store_true")
@@ -1040,7 +1109,16 @@ def main() -> int:
     args = ap.parse_args()
 
     try:
-        bp = load_json(args.blueprint)
+        if bool(args.skeleton) != bool(args.fill):
+            raise CompileError("bad_fill", "pass --skeleton and --fill together")
+        if args.blueprint and args.skeleton:
+            raise CompileError("bad_fill", "pass either a full blueprint or --skeleton/--fill")
+        if not args.blueprint and not args.skeleton:
+            raise CompileError("bad_meta", "pass a blueprint or --skeleton/--fill")
+        if args.skeleton:
+            bp = merge_fill(load_json(args.skeleton), load_json(args.fill))
+        else:
+            bp = load_json(args.blueprint)
         intake = load_json(args.intake) if args.intake else None
         result = compile_blueprint(bp, intake=intake, strict=args.strict)
     except CompileError as exc:
