@@ -132,6 +132,7 @@ validate with `--strict`.
 | breath | a rest at every sadr/ajuz end | the line runs into the next one |
 | cadence | sadr not on `1`; ajuz on `5`/`1`; halves differ | both halves close alike |
 | long-notes | at least 17% of notes are 1 beat or longer | everything is short |
+| register | verse phrase medians span 12+ semitones | the verse is flat |
 
 Thresholds live in `assets/craft_thresholds.json`. They are **provisional**:
 they were calibrated on one singable reference score and three scores with the
@@ -146,3 +147,4 @@ as a syntax error.
 | no breath | add `r:1.5` (sadr) or `r:2` (bayt); the compiler inserts it if absent |
 | sadr on `1` or same cadence | end the sadr on `2`, `4`, or `5`; vary the ajuz |
 | long-notes low | turn repeated `:.5` notes into `:1` or `:2` on key words |
+| register flat | lift the ajuz 4–7 semitones; keep the sadr low instead of moving the whole verse |

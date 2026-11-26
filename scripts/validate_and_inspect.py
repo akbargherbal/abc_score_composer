@@ -582,6 +582,7 @@ def print_verbose(m: dict, path: str) -> None:
     cm = craft.get("metrics") or {}
     if cm:
         print(f"CRAFT long-notes {_num(cm.get('long_note_share'))}  "
+              f"register-range {_num(cm.get('verse_register_range'), '{:.0f}')}  "
               f"line-lengths {cm.get('line_lengths')}  "
               f"breath-misses {cm.get('breath_misses')}  "
               f"cadence-misses {cm.get('cadence_misses')}")

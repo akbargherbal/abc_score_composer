@@ -22,6 +22,9 @@
     "verse_bars_mod": 4,
     "line_bars_allowed": [2, 4],
     "bayt_bars": 8,
-    "breath_rest_min": 0.5
+    "breath_rest_min": 0.5,
+    "phrase_break_beats": 1.5,
+    "min_phrase_notes": 2,
+    "verse_register_range_min": 12
   }
 }

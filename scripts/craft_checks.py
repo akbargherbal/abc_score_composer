@@ -26,6 +26,9 @@ DEFAULTS = {
     "line_bars_allowed": [2, 4],
     "bayt_bars": 8,
     "breath_rest_min": 0.5,
+    "phrase_break_beats": 1.5,
+    "min_phrase_notes": 2,
+    "verse_register_range_min": 12,
 }
 
 
@@ -60,6 +63,38 @@ def _trail_rest(events) -> float:
             break
         total += float(ev["dur"])
     return total
+
+
+def verse_phrase_medians(v_bars: list[dict], break_beats: float = 1.5,
+                         min_notes: int = 2) -> list[float]:
+    """Median pitch of each sung verse phrase, split at rests >= break_beats."""
+    phrases: list[tuple[str, list[int]]] = []
+    current: list[int] = []
+    section = None
+    rest = 0.0
+
+    def flush():
+        nonlocal current
+        if len(current) >= min_notes:
+            phrases.append((section or "", current))
+        current = []
+
+    for bar in v_bars:
+        if not current:
+            section = bar.get("section")
+        for ev in bar["events"]:
+            if ev["type"] == "note":
+                if rest >= break_beats and current:
+                    flush()
+                rest = 0.0
+                current.append(ev["midi"])
+            else:
+                rest += float(ev["dur"])
+                if rest >= break_beats and current:
+                    flush()
+    flush()
+    return [statistics.median(notes) for label, notes in phrases
+            if label.lower().startswith("verse")]
 
 
 def derive_line_map(v_bars: list[dict], tonic_pc: int) -> list[dict]:
@@ -114,6 +149,15 @@ def analyse_craft(v_bars: list[dict], sections: list[dict], key_info: dict,
     if long_share is not None and long_share < th["long_note_share_min"]:
         flag(f"only {long_share:.0%} of vocal notes are held for a beat or more; "
              f"let the important words ring")
+
+    verse_medians = verse_phrase_medians(v_bars, float(th["phrase_break_beats"]),
+                                         int(th["min_phrase_notes"]))
+    register_range = (max(verse_medians) - min(verse_medians)
+                      if len(verse_medians) >= 2 else None)
+    if (register_range is not None
+            and register_range < th["verse_register_range_min"]):
+        flag(f"register flat: verse line medians span {register_range:.0f} st; "
+             f"lift the ajuz 4-7 semitones")
 
     line_map = None
     craft_sections = sections
@@ -187,6 +231,8 @@ def analyse_craft(v_bars: list[dict], sections: list[dict], key_info: dict,
 
     metrics = {
         "long_note_share": round(long_share, 2) if long_share is not None else None,
+        "verse_register_range": (round(register_range, 1)
+                                 if register_range is not None else None),
         "line_lengths": [int(r["bars"]) for r in lyric_lines
                          if str(r.get("kind") or "").lower() in ("verse", "chorus")],
         "breath_misses": breath_misses,
