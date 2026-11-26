@@ -497,6 +497,109 @@ def fmt_band(value: float, b: dict | None, nd: int = 0) -> str:
             if isinstance(value, float) else f"{value} (p50 {b['p50']}, p90 {b['p90']})")
 
 
+def _num(value, fmt="{:.2f}") -> str:
+    if value is None:
+        return "n/a"
+    return fmt.format(value) if isinstance(value, float) else str(value)
+
+
+def print_compact(m: dict, path: str) -> None:
+    """One line on success; only failing flags on failure."""
+    craft = m.get("craft") or {}
+    cflags = craft.get("flags") or []
+    errors = m.get("errors") or []
+    warnings = m.get("warnings") or []
+    target_flags = [f for f in (m.get("flags") or []) if "corpus" not in f]
+    am = m.get("abc2midi") or {}
+    if m.get("ok") and not cflags and not target_flags:
+        midi = ("abc2midi OK" if am.get("available") and not errors and not warnings
+                else f"abc2midi {len(errors)} errors, {len(warnings)} warnings")
+        print(f"OK {m['bars']} bars {m['meter']} {m['key']} {m['tempo']} BPM "
+              f"| {midi} | CRAFT OK")
+        return
+    print(f"FILE {path}")
+    if errors:
+        print("ERRORS")
+        for e in errors[:10]:
+            print("  " + e)
+    if warnings:
+        print("WARNINGS")
+        for w in warnings[:8]:
+            print("  " + w)
+    if cflags:
+        print("CRAFT FLAGS " + "; ".join(cflags[:8]))
+    if target_flags:
+        print("TARGET FLAGS " + "; ".join(target_flags[:8]))
+
+
+def print_verbose(m: dict, path: str) -> None:
+    """Full card, including corpus bands and every diagnostic."""
+    print(f"FILE {path}")
+    am = m.get("abc2midi", {})
+    if am.get("available"):
+        print(f"abc2midi {am.get('version','')}: {len(am.get('errors', []))} errors, "
+              f"{len(am.get('warnings', []))} warnings")
+    else:
+        print("abc2midi: NOT FOUND")
+    print(f"FORM {m['bars']} bars  {m['meter']}  {m['key']}  {m['tempo']} BPM  "
+          f"| " + " ".join(f"{s['label']} {s['bars']}" for s in m["sections"]))
+    rng = m["range"]
+    print(f"VOCAL range {rng['low_name']}-{rng['high_name']} ({rng['span']} st; "
+          f"p50 {m['bands']['vocal_span']['p50'] if m['bands'].get('vocal_span') else '?'}, "
+          f"p90 {m['bands']['vocal_span']['p90'] if m['bands'].get('vocal_span') else '?'})"
+          f"  onsets {m['onsets_per_beat']:.2f}/beat  rest {m['rest_ratio']:.2f}")
+    if m.get("maqam_fit") is not None:
+        print(f"MAQAM {m.get('maqam')} fit {m['maqam_fit']:.0%}  "
+              f"expected pc {m.get('maqam_expected')}")
+    print(f"MOTION step {m['step_ratio']:.2f}  leap {m['leap_ratio']:.2f}  "
+          f"repeat {m['repeat_ratio']:.2f}  dominant dur {m['dominant_duration_share']:.2f}"
+          if m['dominant_duration_share'] is not None else
+          f"MOTION step {m['step_ratio']:.2f}  leap {m['leap_ratio']:.2f}  repeat {m['repeat_ratio']:.2f}")
+    if m.get("chorus_lift") is not None:
+        cb = m["bands"].get("chorus_lift") or {}
+        print(f"REGISTER verse {m.get('verse_median')}  chorus {m.get('chorus_median')}  "
+              f"lift {m['chorus_lift']:+.0f} st  "
+              f"(p50 {cb.get('p50', '?')}, p90 {cb.get('p90', '?')})")
+    if m.get("call_response") is not None:
+        print(f"INS active {m['bars_with_ins']}/{m['bars']} bars  "
+              f"under-vocal {(m.get('ins_under_vocal') or 0):.2f}  "
+              f"call-response {m['call_response']:.2f}")
+    else:
+        print(f"INS active {m['bars_with_ins']}/{m['bars']} bars")
+    mel = m.get("melisma")
+    if mel:
+        tgt = m.get("targets", {}).get("melisma")
+        print(f"MELISMA {mel['rate']:.2f} notes/syl ({mel.get('notes')} notes / "
+              f"{mel.get('syllables')} syl)" + (f"  target {tgt} {'OK' if mel['rate'] >= tgt else 'LOW'}" if tgt else ""))
+    print(f"PHRASE longest {m['longest_vocal_run']['seconds']}s  |  "
+          f"CHORDS {m['chord_changes_per_bar']:.2f}/bar  "
+          f"{', '.join(list(m['chord_qualities'])[:6])}")
+    if m["sections"]:
+        print("SECTIONS " + " | ".join(
+            f"{s['label']} {s['bars']}b med {s['median']} ({s['vocal_notes']}n, ins {s['ins_notes']})"
+            for s in m["sections"]))
+    craft = m.get("craft") or {}
+    cm = craft.get("metrics") or {}
+    if cm:
+        print(f"CRAFT long-notes {_num(cm.get('long_note_share'))}  "
+              f"line-lengths {cm.get('line_lengths')}  "
+              f"breath-misses {cm.get('breath_misses')}  "
+              f"cadence-misses {cm.get('cadence_misses')}")
+        print("CRAFT FLAGS " + "; ".join(craft["flags"][:8]) if craft.get("flags") else "CRAFT OK")
+    if m["flags"]:
+        print("FLAGS " + "; ".join(m["flags"][:10]))
+    if m["diagnostics"]:
+        print("DIAGS " + "; ".join(m["diagnostics"][:8]))
+    if m["errors"]:
+        print("ERRORS")
+        for e in m["errors"][:10]:
+            print("  " + e)
+    if m["warnings"]:
+        print("WARNINGS")
+        for w in m["warnings"][:8]:
+            print("  " + w)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("abc")
@@ -508,6 +611,8 @@ def main() -> int:
                     help="craft_thresholds.json (default: ../assets/craft_thresholds.json)")
     ap.add_argument("--strict", action="store_true",
                     help="exit 1 when a declared target fails")
+    ap.add_argument("--verbose", action="store_true",
+                    help="print the full card, including corpus bands")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--pretty", action="store_true")
     args = ap.parse_args()
@@ -524,80 +629,10 @@ def main() -> int:
 
     if args.json:
         print(dump_json(r, None, pretty=args.pretty))
+    elif args.verbose:
+        print_verbose(r, args.abc)
     else:
-        m = r
-        print(f"FILE {args.abc}")
-        am = m.get("abc2midi", {})
-        if am.get("available"):
-            print(f"abc2midi {am.get('version','')}: {len(am.get('errors', []))} errors, "
-                  f"{len(am.get('warnings', []))} warnings")
-        else:
-            print("abc2midi: NOT FOUND")
-        print(f"FORM {m['bars']} bars  {m['meter']}  {m['key']}  {m['tempo']} BPM  "
-              f"| " + " ".join(f"{s['label']} {s['bars']}" for s in m["sections"]))
-        rng = m["range"]
-        print(f"VOCAL range {rng['low_name']}-{rng['high_name']} ({rng['span']} st; "
-              f"p50 {m['bands']['vocal_span']['p50'] if m['bands'].get('vocal_span') else '?'}, "
-              f"p90 {m['bands']['vocal_span']['p90'] if m['bands'].get('vocal_span') else '?'})"
-              f"  onsets {m['onsets_per_beat']:.2f}/beat  rest {m['rest_ratio']:.2f}")
-        if m.get("maqam_fit") is not None:
-            print(f"MAQAM {m.get('maqam')} fit {m['maqam_fit']:.0%}  "
-                  f"expected pc {m.get('maqam_expected')}")
-        print(f"MOTION step {m['step_ratio']:.2f}  leap {m['leap_ratio']:.2f}  "
-              f"repeat {m['repeat_ratio']:.2f}  dominant dur {m['dominant_duration_share']:.2f}"
-              if m['dominant_duration_share'] is not None else
-              f"MOTION step {m['step_ratio']:.2f}  leap {m['leap_ratio']:.2f}  repeat {m['repeat_ratio']:.2f}")
-        if m.get("chorus_lift") is not None:
-            cb = m["bands"].get("chorus_lift") or {}
-            print(f"REGISTER verse {m.get('verse_median')}  chorus {m.get('chorus_median')}  "
-                  f"lift {m['chorus_lift']:+.0f} st  "
-                  f"(p50 {cb.get('p50', '?')}, p90 {cb.get('p90', '?')})")
-        if m.get("call_response") is not None:
-            print(f"INS active {m['bars_with_ins']}/{m['bars']} bars  "
-                  f"under-vocal {(m.get('ins_under_vocal') or 0):.2f}  "
-                  f"call-response {m['call_response']:.2f}")
-        else:
-            print(f"INS active {m['bars_with_ins']}/{m['bars']} bars")
-        mel = m.get("melisma")
-        if mel:
-            tgt = m.get("targets", {}).get("melisma")
-            print(f"MELISMA {mel['rate']:.2f} notes/syl ({mel.get('notes')} notes / "
-                  f"{mel.get('syllables')} syl)" + (f"  target {tgt} {'OK' if mel['rate'] >= tgt else 'LOW'}" if tgt else ""))
-        print(f"PHRASE longest {m['longest_vocal_run']['seconds']}s  |  "
-              f"CHORDS {m['chord_changes_per_bar']:.2f}/bar  "
-              f"{', '.join(list(m['chord_qualities'])[:6])}")
-        if m["sections"]:
-            print("SECTIONS " + " | ".join(
-                f"{s['label']} {s['bars']}b med {s['median']} ({s['vocal_notes']}n, ins {s['ins_notes']})"
-                for s in m["sections"]))
-        craft = m.get("craft") or {}
-        cm = craft.get("metrics") or {}
-        if cm:
-            def num(key, fmt="{:.2f}"):
-                value = cm.get(key)
-                return "n/a" if value is None else (fmt.format(value)
-                                                     if isinstance(value, float) else str(value))
-            print(f"CRAFT phrases {num('phrases')}  notes {num('notes')}  "
-                  f"long-notes {num('long_note_share')}  fast-notes {num('fast_note_share')}  "
-                  f"end-long {num('phrase_end_long_share')}  "
-                  f"reg-stdev {num('verse_register_stdev')}  range {num('verse_register_range')}  "
-                  f"cad-on-1 {num('cadence_tonic_share')}  motif {num('motif_reuse')}")
-            if craft.get("flags"):
-                print("CRAFT FLAGS " + "; ".join(craft["flags"][:8]))
-            else:
-                print("CRAFT OK")
-        if m["flags"]:
-            print("FLAGS " + "; ".join(m["flags"][:10]))
-        if m["diagnostics"]:
-            print("DIAGS " + "; ".join(m["diagnostics"][:8]))
-        if m["errors"]:
-            print("ERRORS")
-            for e in m["errors"][:10]:
-                print("  " + e)
-        if m["warnings"]:
-            print("WARNINGS")
-            for w in m["warnings"][:8]:
-                print("  " + w)
+        print_compact(r, args.abc)
     return 0 if r.get("ok") else 1
 
 

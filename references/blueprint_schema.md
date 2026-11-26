@@ -180,8 +180,8 @@ does not add `w:` lines. Each entry records one lyric line occurrence:
 
 `cadence_pc` is the semitone distance of the last note above the tonic
 (0 = degree 1, 7 = degree 5); `cadence_degree` is the same note spelled as a
-Blueprint degree. The report also has `auto_breath`, a list of bars where the
-compiler had to shorten notes to fit the required breath rest. The inspector uses it to check that a sadr does
+Blueprint degree. The report's `auto_breath` lists bars where the compiler
+shortened notes for the breath rest. The inspector uses it to check that a sadr does
 not end on degree 1 and that an ajuz settles on 5 or 1. `end_rest` and
 `lead_rest` are the rests at the line boundary; at least 0.5 beat is a breath.
 
@@ -219,9 +219,9 @@ The validator prints a compact card:
 - `SECTIONS` — per-section bars, median, notes.
 - `FLAGS` — corpus p10/p90 extremes and target misses.
 - `DIAGS` — concrete musical fixes.
-- `CRAFT` — phrase count, long/fast note share, phrase-ending length,
-  verse-register spread, tonic-cadence share, and motif reuse.
-- `CRAFT FLAGS` — prosodic problems: compressed bayts, no breath, same
-  cadence in both halves, flat register, wandering or over-literal motifs.
+- `CRAFT` — shatr/bayt length, breath, sadr/ajuz cadence, and long-note share.
+- `CRAFT FLAGS` — compressed bayts, no breath, or a repeated/tonic sadr cadence.
+- `--verbose` — full card with corpus bands and diagnostics. The default is
+  one line on success, and only the failing flags on failure.
 - `ERRORS` / `WARNINGS` — hard failures from bar sums, voice alignment, and
   abc2midi.

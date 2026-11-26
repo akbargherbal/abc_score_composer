@@ -128,14 +128,10 @@ validate with `--strict`.
 
 | Metric | Good sign | Flag |
 |---|---|---|
-| `long-notes` | at least 17% of notes are 1 beat or longer | everything is short |
-| `fast-notes` | at most 16.5% are 0.25 beat or shorter | the line is a stream of subdivisions |
-| `end-long` | at least 35% of phrases end on a long note | no audible qafla |
-| `reg-stdev` | verse phrase medians vary by 4+ semitones | a flat register |
-| `range` | verse phrase medians span 12.5+ semitones | no arc |
-| `cad-on-1` | at most 17% of phrases end on the tonic | every line closes, so nothing develops |
-| `motif` | 15–45% of phrase openings reuse the cell | below = wandering, above = literal repetition |
-| line map | each hemistich 2 or 4 bars, each bayt 8 | a compressed or padded bayt |
+| line/bayt length | each hemistich 2 or 4 bars, each bayt 8 | a compressed or padded bayt |
+| breath | a rest at every sadr/ajuz end | the line runs into the next one |
+| cadence | sadr not on `1`; ajuz on `5`/`1`; halves differ | both halves close alike |
+| long-notes | at least 17% of notes are 1 beat or longer | everything is short |
 
 Thresholds live in `assets/craft_thresholds.json`. They are **provisional**:
 they were calibrated on one singable reference score and three scores with the
@@ -146,12 +142,7 @@ as a syntax error.
 
 | `CRAFT FLAG` | Blueprint change |
 |---|---|
+| line/bayt length | use the skeleton's `syl` ranges; each shatr is 4 bars and each bayt 8 |
+| no breath | add `r:1.5` (sadr) or `r:2` (bayt); the compiler inserts it if absent |
+| sadr on `1` or same cadence | end the sadr on `2`, `4`, or `5`; vary the ajuz |
 | long-notes low | turn repeated `:.5` notes into `:1` or `:2` on key words |
-| fast-notes high | remove `:.25` turns, keep one turn per phrase |
-| end-long low | hold the last syllable of the line for `1` or `2` beats |
-| register flat | raise the ajuz degrees by `+` or write `5+`/`b7` instead of `1`/`b2` |
-| cad-on-1 high | change sadr endings to `2`, `4`, or `5`; keep `1` for the last ajuz |
-| motif low | state a 4–6 note cell in the first sadr and reuse it with `vary:end-` |
-| motif high | vary the tail or `+oct`/`shift:2` the later statements |
-| line/bayt length | rewrite the `syl` ranges so each shatr is 4 bars and each bayt 8 |
-| no breath | add `r:1.5` (sadr) or `r:2` (bayt) to the line's last bar |

@@ -173,7 +173,7 @@ class ValidatorTests(unittest.TestCase):
              "--report", rep, "--validation-out", val, "--strict"], check=True)
         p = run([os.path.join(SCRIPTS, "validate_and_inspect.py"), abc,
                  "--report", rep, "--validation", val,
-                 "--abc2midi", binary, "--strict"], check=True)
+                 "--abc2midi", binary, "--strict", "--verbose"], check=True)
         self.assertIn("0 errors, 0 warnings", p.stdout)
         self.assertIn("MELISMA", p.stdout)
 
@@ -205,7 +205,7 @@ class CraftTests(unittest.TestCase):
         data = self._inspect(abc, rep, val)
         self.assertTrue(data["ok"], data.get("errors"))
         self.assertEqual(data["craft"]["flags"], [])
-        self.assertGreaterEqual(data["craft"]["metrics"]["verse_register_range"], 12.5)
+        self.assertGreaterEqual(data["craft"]["metrics"]["long_note_share"], 0.17)
 
     def test_craft_separates_good_from_bad_fixtures(self):
         good = self._inspect(os.path.join(self.FIXTURES, "excellent.txt"))

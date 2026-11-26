@@ -1,62 +1,27 @@
 {
-  "version": "0.2.0",
+  "version": "0.2.1",
   "status": "provisional",
-  "why": "The corpus has no lyrics, so it cannot measure text-setting. These thresholds were calibrated on four hand-labelled scores: one singable score (excellent.txt) and three scores with the reported aimless-scalar defect (07, 11, 16). They are advisory, not corpus percentiles.",
+  "why": "The corpus has no lyrics, so it cannot measure text-setting. These four checks are calibrated on one singable score (excellent.txt) and three scores with the reported aimless-scalar defect (07, 11, 16). They are advisory, not corpus percentiles.",
   "calibration": {
-    "excellent": {
-      "long_note_share": 0.26,
-      "fast_note_share": 0.10,
-      "phrase_end_long_share": 0.50,
-      "verse_register_stdev": 5.39,
-      "verse_register_range": 18,
-      "cadence_tonic_share": 0.12,
-      "motif_reuse": 0.27
+    "long_note_share": {
+      "excellent": 0.26,
+      "07": 0.03,
+      "11": 0.07,
+      "16": 0.08
     },
-    "07": {
-      "long_note_share": 0.03,
-      "fast_note_share": 0.33,
-      "phrase_end_long_share": 0.21,
-      "verse_register_stdev": 2.58,
-      "verse_register_range": 11,
-      "cadence_tonic_share": 0.42,
-      "motif_reuse": 0.47
-    },
-    "11": {
-      "long_note_share": 0.07,
-      "fast_note_share": 0.25,
-      "phrase_end_long_share": 0.09,
-      "verse_register_stdev": 2.62,
-      "verse_register_range": 10,
-      "cadence_tonic_share": 0.36,
-      "motif_reuse": 0.18
-    },
-    "16": {
-      "long_note_share": 0.08,
-      "fast_note_share": 0.23,
-      "phrase_end_long_share": 0.07,
-      "verse_register_stdev": 2.12,
-      "verse_register_range": 8,
-      "cadence_tonic_share": 0.21,
-      "motif_reuse": 0.0
+    "verse_bars": {
+      "excellent": [28, 32],
+      "07": [22, 17],
+      "11": [26, 21],
+      "16": [22, 17]
     }
   },
   "thresholds": {
-    "phrase_break_beats": 1.5,
-    "min_phrase_notes": 2,
     "long_note_beats": 1.0,
-    "fast_note_beats": 0.25,
     "long_note_share_min": 0.17,
-    "fast_note_share_max": 0.165,
-    "phrase_end_long_min": 0.35,
-    "verse_register_stdev_min": 4.0,
-    "verse_register_range_min": 12.5,
-    "cadence_tonic_share_max": 0.17,
     "verse_bars_mod": 4,
     "line_bars_allowed": [2, 4],
     "bayt_bars": 8,
-    "breath_rest_min": 0.5,
-    "motif_notes": 4,
-    "motif_reuse_min": 0.15,
-    "motif_reuse_max": 0.45
+    "breath_rest_min": 0.5
   }
 }

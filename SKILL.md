@@ -74,11 +74,12 @@ python3 <skill>/scripts/validate_and_inspect.py song.abc \
   --report song.report.json --validation song.validation.abc
 ```
 
-Compile writes `song.abc` only when bar sums and voice alignment pass.
-`--strict` requires `syl` on every vocal bar. The validation file has temporary
-`w:` placeholders; the delivered ABC has none. A verse that is not whole bayts
-fails with `bad_verse_bars`; the compiler also inserts the missing breath
-(`r:1.5` after a sadr, `r:2` after an ajuz).
+Compile writes `song.abc` when bar sums and voice alignment pass.
+`--strict` requires `syl` on every vocal bar. The delivered ABC has no `w:`
+lines. A verse that is not whole bayts fails with `bad_verse_bars`; the
+compiler also inserts the missing breath (`r:1.5` after a sadr, `r:2` after an
+ajuz). The card is one line on success; `--verbose` prints the
+corpus card.
 
 - `ERRORS` are structural (`bar_sum`, `syl_mismatch`, `bad_chord`, `range`,
   `grid`, `bad_motif`, `bad_verse_bars`). Fix the Blueprint and recompile.
@@ -92,8 +93,8 @@ fails with `bad_verse_bars`; the compiler also inserts the missing breath
 Change the smallest unit: one bar, one motif, one section reference, then
 recompile the whole file. Never edit `song.abc` with `sed`, Python, or piecemeal
 edits. If a CRAFT flag appears, change only the affected bars; do not rewrite
-the whole Blueprint. Concrete fixes for each flag: `references/vocal_craft.md`
-(optional reference, read it when a flag appears).
+the whole Blueprint. Fixes: `references/vocal_craft.md` (read it when a flag
+appears).
 
 ## 5. Release
 
@@ -102,7 +103,7 @@ Deliver `song.abc` when:
 - `abc2midi` reports **0 errors and 0 warnings**;
 - every bar sums and both voices have the same bar count;
 - `syl` covers the vocal bars and no intake line is unused;
-- CRAFT is advisory: mention any flag, but do not chase it;
+- CRAFT is advisory: mention any flag, do not chase it;
 - the chorus is above the verse and the vocal span fits one singer;
 - the file has the corpus header and no `w:` lines.
 
