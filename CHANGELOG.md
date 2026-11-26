@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.2.1
+
+- Leaner footprint without dropping a prosody rule.
+  - `SKILL.md` 13,921 B → 6,062 B; mandatory pre-Blueprint reading 34,028 B
+    → 24,961 B; success card 223 → 13 words; failure card 248 → 27 words.
+  - Example Blueprint 3,733 B → 3,444 B for the same 30 bars; agent payload
+    stays 27.2 B/bar.
+- `intake_lyrics.py` writes `blueprint_skeleton.json`: sections, bars, `ch`,
+  and `syl` ranges (4 bars per shatr, 2/4 for short lines, `same_as` repeats).
+  The agent fills only `voc` and `ins`.
+- `compile_abc.py` inserts a missing breath rest (`r:1.5` sadr, `r:2` ajuz)
+  and rejects a verse that is not whole bayts with `bad_verse_bars`.
+- CRAFT is now four checks: line/bayt length, breath, sadr/ajuz cadence, and
+  long-note share. Motif, fast-note, register-spread, range, and end-long
+  metrics are gone; the patch advice remains in `references/vocal_craft.md`.
+- The default inspector card is one line on success and only failing flags on
+  failure; `--verbose` restores the full card and corpus bands.
+- One musical patch round after the first clean compile; CRAFT flags are
+  reported but not chased.
+- Tests: added skeleton-to-ABC equality and verse-bar-count rejection; all 13
+  tests pass with abc2midi.
+- Full-prompt footprint: 104 bars, ~774 output tokens (motifs + voc/ins),
+  0 musical patch rounds; per bar 7.4 tokens versus ~32 in the 0.1.0 run.
+
 ## 0.2.0
 
 - New prosodic layer: `references/vocal_craft.md` defines the line plan

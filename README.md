@@ -22,9 +22,10 @@ a worked eight-bar bayt are in `references/vocal_craft.md`.
 ## Quick start
 
 ```bash
-python3 scripts/intake_lyrics.py --in prompt.txt -o intake.json
+python3 scripts/intake_lyrics.py --in prompt.txt -o intake.json \
+  --skeleton blueprint_skeleton.json
 
-python3 scripts/compile_abc.py blueprint.json -o song.abc \
+python3 scripts/compile_abc.py blueprint_skeleton.json -o song.abc \
   --intake intake.json --report song.report.json \
   --validation-out song.validation.abc --strict
 
@@ -32,6 +33,9 @@ python3 scripts/validate_and_inspect.py song.abc \
   --report song.report.json --validation song.validation.abc \
   --abc2midi /path/to/abc2midi
 ```
+
+Fill only `voc` and `ins` in the skeleton; `ch` and `syl` are already there.
+The inspector prints one line on success; add `--verbose` for the full card.
 
 The delivered `song.abc` mirrors the corpus: `V: Vocal` + `V: Ins`, no `w:`
 lyrics, 4-bar voice blocks, chord symbols on the vocal, `Z` for silent bars.
@@ -82,5 +86,5 @@ scores, and a miner smoke test.
 - `references/vocal_craft.md` — prosody, phrase, cadence, motif, register rules.
 - `references/corpus.md` — corpus percentiles, forms, chord loops, riffs.
 - `assets/craft_thresholds.json` — provisional craft thresholds and calibration.
-- `assets/example_*` — a working 30-bar example (prompt, intake, Blueprint, ABC).
+- `assets/example_*` — a working 30-bar example (prompt, intake, skeleton, Blueprint, ABC).
 - `tests/fixtures/` — the one good and three defective reference scores.
