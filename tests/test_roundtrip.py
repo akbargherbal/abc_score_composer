@@ -220,6 +220,56 @@ class CraftTests(unittest.TestCase):
         self.assertTrue(any("held for a beat" in f for f in seven["craft"]["flags"]))
 
 
+class SkeletonTests(unittest.TestCase):
+    def test_skeleton_completes_to_same_abc(self):
+        tmp = tempfile.mkdtemp(prefix="abc_skeleton_")
+        sk_path = os.path.join(tmp, "blueprint_skeleton.json")
+        intake = os.path.join(tmp, "intake.json")
+        run([os.path.join(SCRIPTS, "intake_lyrics.py"),
+             "--in", os.path.join(ASSETS, "example_prompt.txt"),
+             "-o", intake, "--skeleton", sk_path], check=True)
+        skeleton = load(sk_path)
+        full = load(os.path.join(ASSETS, "example_blueprint.json"))
+        skeleton["motifs"] = full.get("motifs", {})
+        by_id = {s["id"]: s for s in full["sections"]}
+        for sec in skeleton["sections"]:
+            source = by_id[sec["id"]]
+            self.assertEqual(len(sec["bars"]), len(source["bars"]), sec["id"])
+            for bar, src in zip(sec["bars"], source["bars"]):
+                bar["voc"] = src.get("voc", "rest")
+                bar["ins"] = src.get("ins", "rest")
+        completed = os.path.join(tmp, "completed.json")
+        with open(completed, "w", encoding="utf-8") as f:
+            json.dump(skeleton, f)
+        abc_full = os.path.join(tmp, "full.abc")
+        abc_skel = os.path.join(tmp, "skel.abc")
+        for src, out in ((os.path.join(ASSETS, "example_blueprint.json"), abc_full),
+                         (completed, abc_skel)):
+            run([os.path.join(SCRIPTS, "compile_abc.py"), src, "-o", out,
+                 "--intake", intake, "--strict"], check=True)
+        with open(abc_full, encoding="utf-8") as f:
+            full_text = f.read()
+        with open(abc_skel, encoding="utf-8") as f:
+            skel_text = f.read()
+        self.assertEqual(full_text, skel_text)
+
+    def test_verse_bar_count_is_rejected(self):
+        tmp = tempfile.mkdtemp(prefix="abc_verse_")
+        bp = {
+            "meta": {"key": "Dm", "meter": "4/4", "tempo": 84},
+            "sections": [{"id": "verse_1", "kind": "verse",
+                          "bars": [{"ch": "Dm"} for _ in range(6)]}],
+        }
+        path = os.path.join(tmp, "bp.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(bp, f)
+        p = run([os.path.join(SCRIPTS, "compile_abc.py"), path,
+                 "-o", os.path.join(tmp, "x.abc"),
+                 "--intake", os.path.join(ASSETS, "example_intake.json")])
+        self.assertEqual(p.returncode, 1)
+        self.assertIn("bad_verse_bars", p.stdout)
+
+
 class MinerTests(unittest.TestCase):
     def test_miner_smoke(self):
         corpus = os.path.join(BASE, "..", "670_arabic_songs_abc_scores")
