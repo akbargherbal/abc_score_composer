@@ -1,0 +1,74 @@
+# abc-score-writer
+
+A lean, deterministic skill for composing SheetSage2-style two-voice ABC
+scores from Arabic lyrics and a style prompt.
+
+The model writes a **Blueprint** (scale degrees, beats, syllables, chords,
+motifs). Python does the notation math and validation. No third-party packages.
+
+This is a clean-room replacement for the legacy `02_maqam-score`
+patch-by-patch workflow. The old architecture mixed composition with notation
+repair; this one separates them: the model composes, the compiler and
+inspector measure, and the model patches the Blueprint rather than the ABC.
+
+## Quick start
+
+```bash
+python3 scripts/intake_lyrics.py --in prompt.txt -o intake.json
+
+python3 scripts/compile_abc.py blueprint.json -o song.abc \
+  --intake intake.json --report song.report.json \
+  --validation-out song.validation.abc --strict
+
+python3 scripts/validate_and_inspect.py song.abc \
+  --report song.report.json --validation song.validation.abc \
+  --abc2midi /path/to/abc2midi
+```
+
+The delivered `song.abc` mirrors the corpus: `V: Vocal` + `V: Ins`, no `w:`
+lyrics, 4-bar voice blocks, chord symbols on the vocal, `Z` for silent bars.
+
+## Install
+
+Copy this directory into your skills folder, or package it as a zip:
+
+```bash
+# OpenCode
+cp -r abc-score-writer ~/.config/opencode/skills/
+# Claude Code
+cp -r abc-score-writer ~/.claude/skills/
+
+# or package
+cd ..
+zip -r abc-score-writer.zip abc-score-writer
+```
+
+`abc2midi` is required for validation. Install it with your package manager
+(`apt-get install abcmidi`, `brew install abcMIDI`) or set `ABC2MIDI`.
+
+## Corpus profile
+
+`assets/corpus_profile.json` is mined from the 670-file SheetSage2 corpus.
+`references/corpus.md` is the readable summary. Rerun the miner with:
+
+```bash
+python3 scripts/mine_corpus.py --corpus /path/to/670_arabic_songs_abc_scores \
+  --out assets/corpus_profile.json
+```
+
+## Tests
+
+```bash
+ABC2MIDI=/path/to/abc2midi python3 tests/test_roundtrip.py
+```
+
+The tests cover Arabic syllabification, the unvocalized fallback, a full
+compile/validate round trip, bar-sum/chord/syllable rejection, and a miner
+smoke test.
+
+## Files
+
+- `SKILL.md` — the workflow the model follows.
+- `references/blueprint_schema.md` — full Blueprint schema and error codes.
+- `references/corpus.md` — corpus percentiles, forms, chord loops, riffs.
+- `assets/example_*` — a working 18-bar example (prompt, intake, Blueprint, ABC).

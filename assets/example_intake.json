@@ -1,0 +1,188 @@
+{
+  "style": {
+    "raw": "classical arabic, melismatic, tarab, symphonic metal, Maqam Kurd, mood: \"somber, night dread\"",
+    "tags": [
+      "classical arabic",
+      "melismatic",
+      "tarab",
+      "symphonic metal",
+      "Maqam Kurd",
+      "mood: \"somber",
+      "night dread\""
+    ],
+    "maqam": "Kurd",
+    "mood": "somber, night dread",
+    "tempo_hint": null,
+    "vocal_tags": [
+      "melismatic",
+      "tarab"
+    ],
+    "instrument_tags": [
+      "symphonic metal"
+    ],
+    "mood_tags": [
+      "somber",
+      "night dread"
+    ],
+    "suggested_key": "Dm",
+    "tempo_default": 93
+  },
+  "sections": [
+    {
+      "index": 0,
+      "name": "Verse 1",
+      "key": "verse_1",
+      "kind": "verse",
+      "cues": "dark brooding vocals | muted rhythmic guitars and heavy bass",
+      "lines": [
+        "verse_1.L1"
+      ],
+      "couplets": 0,
+      "syllables": 16,
+      "est_bars": 4,
+      "line_count": 1
+    },
+    {
+      "index": 1,
+      "name": "Chorus",
+      "key": "chorus",
+      "kind": "chorus",
+      "cues": "anguished powerful vocals | heavy orchestral swell and distorted guitars — Kurd",
+      "lines": [
+        "chorus.L1"
+      ],
+      "couplets": 0,
+      "syllables": 16,
+      "est_bars": 4,
+      "line_count": 1
+    },
+    {
+      "index": 2,
+      "name": "Outro",
+      "key": "outro",
+      "kind": "outro",
+      "cues": "deep male vocals | clean electric guitar",
+      "lines": [
+        "outro.L1"
+      ],
+      "couplets": 0,
+      "syllables": 14,
+      "est_bars": 4,
+      "line_count": 1
+    }
+  ],
+  "lines": [
+    {
+      "id": "verse_1.L1",
+      "section": "verse_1",
+      "section_name": "Verse 1",
+      "index": 1,
+      "text": "اعْتَضْتُ مِنْ وَجْهِ خِلِّي بَعْدَ فُرْقَتِهِ كَأْسًا",
+      "syllables": [
+        "اعْ",
+        "تَضْ",
+        "تُ",
+        "مِنْ",
+        "وَجْ",
+        "هِ",
+        "خِ",
+        "لِّي",
+        "بَعْ",
+        "دَ",
+        "فُرْ",
+        "قَ",
+        "تِ",
+        "هِ",
+        "كَأْ",
+        "سًا"
+      ],
+      "count": 16,
+      "estimated": false,
+      "est_bars": 4
+    },
+    {
+      "id": "chorus.L1",
+      "section": "chorus",
+      "section_name": "Chorus",
+      "index": 1,
+      "text": "مَا كُنْتُ أَحْسَبُ أَنَّ الدَّهْرَ يَفْجَعُنِي بِهِ",
+      "syllables": [
+        "مَا",
+        "كُنْ",
+        "تُ",
+        "أَحْ",
+        "سَ",
+        "بُ",
+        "أَ",
+        "نَّ",
+        "الدَّهْ",
+        "رَ",
+        "يَفْ",
+        "جَ",
+        "عُ",
+        "نِي",
+        "بِ",
+        "هِ"
+      ],
+      "count": 16,
+      "estimated": false,
+      "est_bars": 4
+    },
+    {
+      "id": "outro.L1",
+      "section": "outro",
+      "section_name": "Outro",
+      "index": 1,
+      "text": "قَدْ كُنْتُ مِنْ رَيْبِ دَهْرِي جَازِعًا فَرِقًا",
+      "syllables": [
+        "قَدْ",
+        "كُنْ",
+        "تُ",
+        "مِنْ",
+        "رَيْ",
+        "بِ",
+        "دَهْ",
+        "رِي",
+        "جَ",
+        "ازِ",
+        "عًا",
+        "فَ",
+        "رِ",
+        "قًا"
+      ],
+      "count": 14,
+      "estimated": false,
+      "est_bars": 4
+    }
+  ],
+  "totals": {
+    "lines": 3,
+    "syllables": 46,
+    "est_bars": 12,
+    "sections": 3,
+    "estimated_lines": 0
+  },
+  "reference": {
+    "tempo_p50": 93.0,
+    "bars_per_song_p50": 149.0,
+    "vocal_span_p50": 14.0,
+    "onsets_per_beat_p50": 1.1731,
+    "rest_ratio_p50": 0.4471,
+    "chorus_lift_p50": 1.0,
+    "section_lengths_p50": {
+      "intro": 17.0,
+      "verse": 16.0,
+      "chorus": 16.0,
+      "interlude": 16.0,
+      "bridge": 9.0,
+      "outro": 11.0,
+      "pre-chorus": 8.0
+    },
+    "top_forms": [
+      "intro verse chorus interlude verse chorus outro",
+      "intro verse chorus interlude verse chorus interlude verse chorus",
+      "intro verse chorus interlude verse chorus interlude verse chorus outro",
+      "intro verse chorus interlude verse chorus"
+    ]
+  }
+}

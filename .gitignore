@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+*.mid
+*.midi
+*.wav
+*.mp3
+*.flac
+node_modules/
+.venv/
+
+# private work context; never part of this repository
+conversations-*.zip
+BRIEF.md
+abc-score-writer-workspace/
+670_arabic_songs_abc_scores/
+.opencode/
+opencode.json
