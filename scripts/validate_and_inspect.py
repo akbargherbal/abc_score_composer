@@ -28,6 +28,7 @@ from abc_common import (  # noqa: E402
     bar_has_notes, bar_rest_beats, bar_total_beats, dump_json, load_json,
     midi_to_name, parse_abc,
 )
+from craft_checks import analyse_craft, load_thresholds  # noqa: E402
 
 
 # Pitch classes relative to the tonic for a 12-tone approximation of each maqam.
@@ -146,7 +147,7 @@ def parse_w_melisma(path: str) -> dict | None:
 
 def build_report(abc_path: str, validation: str | None, report_path: str | None,
                  profile_path: str | None, abc2midi_path: str | None,
-                 strict: bool = False) -> dict:
+                 strict: bool = False, craft_thresholds_path: str | None = None) -> dict:
     parsed = parse_abc(abc_path)
     hdr = parsed["header"]
     v_bars = parsed["voices"].get("Vocal", [])
@@ -286,6 +287,14 @@ def build_report(abc_path: str, validation: str | None, report_path: str | None,
     if melisma is None and validation and os.path.exists(validation):
         melisma = parse_w_melisma(validation)
 
+    # Prosodic craft checks.  The compiler report supplies the lyric-line map
+    # when the score came from a Blueprint; an external ABC falls back to its
+    # own source-line breaks.
+    craft_path = craft_thresholds_path or os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "..", "assets", "craft_thresholds.json")
+    craft = analyse_craft(v_bars, sections, hdr["key"], comp_report,
+                          load_thresholds(craft_path))
+
     # If the file has no compiler report, a modal key still tells us the
     # intended family.  Dphr is the ABC spelling of the Kurd/Phrygian scale.
     if not maqam:
@@ -361,6 +370,7 @@ def build_report(abc_path: str, validation: str | None, report_path: str | None,
         "maqam_expected": maqam_expected,
         "targets": targets,
         "sections": sections,
+        "craft": craft,
         "chord_qualities": dict(qualities.most_common(10)),
     }
 
@@ -467,6 +477,10 @@ def build_report(abc_path: str, validation: str | None, report_path: str | None,
     target_fail = any(v is False for v in metrics.get("targets", {}).values() if isinstance(v, bool))
     if strict and target_fail:
         hard_fail = True
+    # CRAFT is advisory by default.  A Blueprint can opt in to a hard gate by
+    # declaring meta.targets.craft = true and compiling/validating --strict.
+    if strict and targets.get("craft") and craft.get("flags"):
+        hard_fail = True
 
     metrics["errors"] = errors
     metrics["warnings"] = warnings
@@ -490,6 +504,8 @@ def main() -> int:
     ap.add_argument("--validation", default=None)
     ap.add_argument("--profile", default=None)
     ap.add_argument("--abc2midi", default=None)
+    ap.add_argument("--craft-thresholds", default=None,
+                    help="craft_thresholds.json (default: ../assets/craft_thresholds.json)")
     ap.add_argument("--strict", action="store_true",
                     help="exit 1 when a declared target fails")
     ap.add_argument("--json", action="store_true")
@@ -500,7 +516,8 @@ def main() -> int:
         os.path.dirname(os.path.abspath(__file__)), "..", "assets", "corpus_profile.json")
     try:
         r = build_report(args.abc, args.validation, args.report, profile,
-                         args.abc2midi, strict=args.strict)
+                         args.abc2midi, strict=args.strict,
+                         craft_thresholds_path=args.craft_thresholds)
     except Exception as exc:
         print(json.dumps({"ok": False, "errors": [f"parse: {exc}"]}))
         return 2
@@ -553,6 +570,22 @@ def main() -> int:
             print("SECTIONS " + " | ".join(
                 f"{s['label']} {s['bars']}b med {s['median']} ({s['vocal_notes']}n, ins {s['ins_notes']})"
                 for s in m["sections"]))
+        craft = m.get("craft") or {}
+        cm = craft.get("metrics") or {}
+        if cm:
+            def num(key, fmt="{:.2f}"):
+                value = cm.get(key)
+                return "n/a" if value is None else (fmt.format(value)
+                                                     if isinstance(value, float) else str(value))
+            print(f"CRAFT phrases {num('phrases')}  notes {num('notes')}  "
+                  f"long-notes {num('long_note_share')}  fast-notes {num('fast_note_share')}  "
+                  f"end-long {num('phrase_end_long_share')}  "
+                  f"reg-stdev {num('verse_register_stdev')}  range {num('verse_register_range')}  "
+                  f"cad-on-1 {num('cadence_tonic_share')}  motif {num('motif_reuse')}")
+            if craft.get("flags"):
+                print("CRAFT FLAGS " + "; ".join(craft["flags"][:8]))
+            else:
+                print("CRAFT OK")
         if m["flags"]:
             print("FLAGS " + "; ".join(m["flags"][:10]))
         if m["diagnostics"]:

@@ -27,7 +27,7 @@ units. Pitches are **scale degrees**, not note letters.
 | `vocal_range` | no | `[low, high]` MIDI, default `[48, 84]`. |
 | `instrument_range` | no | `[low, high]` MIDI, default `[36, 96]`. |
 | `title` | no | Optional label for `notes.md`; the delivered ABC keeps `T:` empty like the corpus. |
-| `targets` | no | Musical targets the inspector checks: `melisma`, `chorus_lift`, `call_response`, `vocal_span`, `max_phrase_seconds`, `dominant_duration`, `maqam_fit`. |
+| `targets` | no | Musical targets the inspector checks: `melisma`, `chorus_lift`, `call_response`, `vocal_span`, `max_phrase_seconds`, `dominant_duration`, `maqam_fit`. Set `craft: true` to turn craft flags into a hard failure under `--strict`. |
 
 ### A section
 
@@ -147,7 +147,33 @@ and `ch` override the copied fields.
 
 The compiler checks the resolved syllable count against the number of vocal
 groups. A mismatch is a `syl_mismatch` error with the section, bar, and the
-first syllables. It also reports unused and partially used lines.
+first syllables. It also reports unused and partially used lines, and builds
+the report `line_map` from these references.
+
+`intake_lyrics.py` marks every line `sadr` or `ajuz` (trailing `...` or
+alternation), numbers its bayt, and budgets four bars per hemistich. Put each
+line in its own four bars; the craft checks use that structure.
+
+## Report line map
+
+The compiler report carries a `line_map` list. It does not change the ABC and
+does not add `w:` lines. Each entry records one lyric line occurrence:
+
+```json
+{
+  "line": "verse_1.L1", "section": "v1", "kind": "verse",
+  "role": "sadr", "bayt": 1, "start_bar": 5, "end_bar": 8, "bars": 4,
+  "lyric_count": 16, "notes": 21, "melisma": 1.31, "median": 62,
+  "cadence_pc": 3, "cadence_degree": "b3",
+  "lead_rest": 0.0, "end_rest": 1.5
+}
+```
+
+`cadence_pc` is the semitone distance of the last note above the tonic
+(0 = degree 1, 7 = degree 5); `cadence_degree` is the same note spelled as a
+Blueprint degree. The inspector uses it to check that a sadr does
+not end on degree 1 and that an ajuz settles on 5 or 1. `end_rest` and
+`lead_rest` are the rests at the line boundary; at least 0.5 beat is a breath.
 
 ## Error codes
 
@@ -181,5 +207,9 @@ The validator prints a compact card:
 - `SECTIONS` — per-section bars, median, notes.
 - `FLAGS` — corpus p10/p90 extremes and target misses.
 - `DIAGS` — concrete musical fixes.
+- `CRAFT` — phrase count, long/fast note share, phrase-ending length,
+  verse-register spread, tonic-cadence share, and motif reuse.
+- `CRAFT FLAGS` — prosodic problems: compressed bayts, no breath, same
+  cadence in both halves, flat register, wandering or over-literal motifs.
 - `ERRORS` / `WARNINGS` — hard failures from bar sums, voice alignment, and
   abc2midi.

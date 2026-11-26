@@ -50,6 +50,13 @@ class IntakeTests(unittest.TestCase):
         self.assertEqual(lines["verse_1.L3"]["count"], 14)
         self.assertEqual(data["totals"]["lines"], 26)
         self.assertFalse(lines["verse_1.L1"]["estimated"])
+        # A bayt is a sadr + ajuz, and each hemistich gets four bars.
+        self.assertEqual(lines["verse_1.L1"]["role"], "sadr")
+        self.assertEqual(lines["verse_1.L2"]["role"], "ajuz")
+        self.assertEqual(lines["verse_1.L1"]["bayt"], 1)
+        self.assertEqual(lines["verse_1.L3"]["bayt"], 2)
+        self.assertEqual(lines["verse_1.L1"]["est_bars"], 4)
+        self.assertEqual(data["totals"]["bayts"], 13)
 
     def test_unvocalized_is_estimated(self):
         out = os.path.join(tempfile.gettempdir(), "abc_intake_unvocalized.json")
@@ -93,9 +100,14 @@ class CompilerTests(unittest.TestCase):
         self.assertIn("V: Ins", text)
         r = load(rep)
         self.assertTrue(r["ok"])
-        self.assertEqual(r["bars"], 18)
+        self.assertEqual(r["bars"], 30)
         self.assertGreaterEqual(r["melisma_rate"], 1.2)
-        self.assertGreaterEqual(r["alignment"]["bars_with_syl"], 12)
+        self.assertGreaterEqual(r["alignment"]["bars_with_syl"], 20)
+        # The report now carries a line map, but the ABC itself still has no
+        # lyric lines and no w: rows.
+        self.assertEqual(len(r["line_map"]), 6)
+        self.assertTrue(all(x["bars"] == 4 for x in r["line_map"]))
+        self.assertTrue(all(x["role"] in ("sadr", "ajuz") for x in r["line_map"]))
 
     def test_bar_sum_error(self):
         tmp = tempfile.mkdtemp(prefix="abc_bad_")
@@ -166,9 +178,54 @@ class ValidatorTests(unittest.TestCase):
         self.assertIn("MELISMA", p.stdout)
 
 
+class CraftTests(unittest.TestCase):
+    FIXTURES = os.path.join(BASE, "tests", "fixtures")
+
+    def _inspect(self, abc_path, report=None, validation=None):
+        binary = os.environ.get("ABC2MIDI") or shutil.which("abc2midi")
+        args = [os.path.join(SCRIPTS, "validate_and_inspect.py"), abc_path, "--json"]
+        if report:
+            args += ["--report", report]
+        if validation:
+            args += ["--validation", validation]
+        if binary:
+            args += ["--abc2midi", binary]
+        p = run(args)
+        return json.loads(p.stdout)
+
+    def test_example_is_craft_clean(self):
+        tmp = tempfile.mkdtemp(prefix="abc_craft_example_")
+        abc = os.path.join(tmp, "song.abc")
+        rep = os.path.join(tmp, "song.report.json")
+        val = os.path.join(tmp, "song.validation.abc")
+        run([os.path.join(SCRIPTS, "compile_abc.py"),
+             os.path.join(ASSETS, "example_blueprint.json"), "-o", abc,
+             "--intake", os.path.join(ASSETS, "example_intake.json"),
+             "--report", rep, "--validation-out", val, "--strict"], check=True)
+        data = self._inspect(abc, rep, val)
+        self.assertTrue(data["ok"], data.get("errors"))
+        self.assertEqual(data["craft"]["flags"], [])
+        self.assertEqual(data["craft"]["metrics"]["fast_note_share"], 0.0)
+        self.assertGreaterEqual(data["craft"]["metrics"]["verse_register_range"], 12.5)
+
+    def test_craft_separates_good_from_bad_fixtures(self):
+        good = self._inspect(os.path.join(self.FIXTURES, "excellent.txt"))
+        self.assertEqual(good["craft"]["flags"], [])
+        for name in ("07-score.txt", "11-score.txt", "16-score.txt"):
+            data = self._inspect(os.path.join(self.FIXTURES, name))
+            self.assertTrue(data["craft"]["flags"], name)
+            self.assertGreaterEqual(len(data["craft"]["flags"]), 3, name)
+        # The bad scores are rejected by the craft checks, not by abc2midi.
+        seven = self._inspect(os.path.join(self.FIXTURES, "07-score.txt"))
+        self.assertTrue(seven["ok"])
+        self.assertTrue(any("held for a beat" in f for f in seven["craft"]["flags"]))
+
+
 class MinerTests(unittest.TestCase):
     def test_miner_smoke(self):
-        corpus = os.path.join(BASE, "..", "..", "670_arabic_songs_abc_scores")
+        corpus = os.path.join(BASE, "..", "670_arabic_songs_abc_scores")
+        if not os.path.isdir(corpus):
+            corpus = os.path.join(BASE, "..", "..", "670_arabic_songs_abc_scores")
         if not os.path.isdir(corpus):
             self.skipTest("corpus not available")
         out = os.path.join(tempfile.gettempdir(), "abc_profile_smoke.json")

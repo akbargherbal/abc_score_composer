@@ -1,6 +1,6 @@
 ---
 name: abc-score-writer
-version: "0.1.0"
+version: "0.2.0"
 description: >-
   Compose a complete SheetSage2-style two-voice ABC score from Arabic lyrics
   and a style prompt (Arabic maqam, tarab, symphonic metal, etc.). The model
@@ -23,14 +23,18 @@ Blueprint. Deliver the `.abc`.**
 ## The loop
 
 ```text
-intake -> Blueprint -> compile -> inspect -> patch Blueprint -> compile
-       -> inspect -> release
+intake -> line plan -> Blueprint -> compile -> inspect -> patch Blueprint
+       -> compile -> inspect -> release
 ```
 
 At most **2 musical patch rounds** after the first clean compile. Fixing
 authoring errors (a wrong syllable range, an octave slip) before that is not a
 musical round. If the same structural problem survives two musical rounds,
 stop and report what the model or the plan could not solve.
+
+The score is a *sung* bayt, not a scale walked up and down. The line plan is
+where that is decided; the compiler and inspector can only measure it after
+the fact.
 
 ## 1. Intake
 
@@ -39,11 +43,27 @@ python3 <skill>/scripts/intake_lyrics.py --in prompt.txt -o intake.json
 ```
 
 Read the printed table. It gives stable line ids (`verse_1.L1`), syllable
-counts, and an estimated bar budget. Use `--json` only when you need the full
-structure. Arabic with *tashkeel* is counted from the vowel marks; unvocalized
-lines are marked `estimated`.
+counts, each line's role (`sadr` or `ajuz`), its bayt number, and a bar budget
+(four bars per shatr, eight per bayt). The role comes from the trailing `...`
+mark, or alternates when the mark is absent. Use `--json` only when you need
+the full structure. Arabic with *tashkeel* is counted from the vowel marks;
+unvocalized lines are marked `estimated`.
 
-## 2. Write the Blueprint
+## 2. Plan the lines
+
+Before writing any notes, copy the intake table and add four musical decisions
+per line. This is the shatr plan; it prevents the "22 bars for five bayts"
+failure where the tune ignores the words.
+
+| line | role | bars | cadence | motif | register |
+|---|---|---:|---|---|---|
+| `verse_1.L1` | sadr | 4 | `2`, `4`, or `5` — not `1` | open with the cell | low |
+| `verse_1.L2` | ajuz | 4 | `5` (or `1` at a section end) | same cell, varied ending | higher |
+
+Rules that matter, with the reasons and a worked eight-bar bayt:
+`references/vocal_craft.md`. Read it before the first Blueprint of a session.
+
+## 3. Write the Blueprint
 
 Write one JSON file. Think musically: form, chord loop, register arc, rhythm,
 melisma, call-and-response. Do **not** write ABC, do **not** do bar arithmetic,
@@ -97,6 +117,8 @@ A complete working example: `assets/example_blueprint.json` with
 - `meta.tempo` — quarter-note BPM. `vocal_octave` shifts the whole vocal line;
   `instrument_octave` does the same for Ins (use `-1` for guitar/bass).
 - `meta.targets` — optional. The inspector checks them and prints `OK/LOW/HIGH`.
+  Set `"craft": true` to make the craft flags a hard failure under `--strict`;
+  otherwise they are advisory.
 - `motifs` — reusable `ins`/`voc` strings. Transforms: `+oct`, `-oct`,
   `shift:<semitones>`, `vary:end-<degree>`.
 - Each bar has `ch` (one chord), `voc`, `syl`, `ins`. Vocal and Ins are written
@@ -110,6 +132,9 @@ A complete working example: `assets/example_blueprint.json` with
   key change or a riff, **not** as a chorus register lift. For a chorus lift in
   the same maqam, write higher degrees (`5`, `6`, `5`) instead. A bar-level copy
   is `{"from": "v1", "take": [0, 1], "voc_shift": 0}`.
+- Keep one lyric line inside its own four bars and put its `@` reference in
+  those bars. The compiler records this as `report.line_map`; the inspector
+  uses it to check cadence and breath without any `w:` lines in the ABC.
 
 **Note grammar**
 
@@ -118,7 +143,7 @@ trailing `+`/`-` shift octaves. Degree `7` is the leading tone **above** the
 tonic: in Dm `b7` is C5 and `b7-` is C4. Durations are quarter-note beats:
 `0.25`, `0.5`, `0.75`, `1`, `1.5`, `2`. A trailing `~` ties to the next note.
 
-## 3. Compile and inspect
+## 4. Compile and inspect
 
 ```bash
 python3 <skill>/scripts/compile_abc.py blueprint.json -o song.abc \
@@ -142,10 +167,14 @@ Read the card, not just the exit code:
   syntax; decide with the ear and the prompt.
 - `DIAGS` — long phrases, no Ins under the vocal, weak call-and-response, no
   chorus lift.
+- `CRAFT` — phrase length, cadence, breath, register arc, long-note and
+  fast-note share, and motif reuse. `CRAFT FLAGS` names the musical problem;
+  `CRAFT OK` means the line plan is audible. These flags are advisory unless
+  `meta.targets.craft` is true and you pass `--strict`.
 - `abc2midi` — any `Error`/`Warning` is a hard failure; the tool does not trust
   exit code 0.
 
-## 4. Patch the Blueprint, not the ABC
+## 5. Patch the Blueprint, not the ABC
 
 Change the smallest musical unit: a bar, a motif, a section reference. Then
 recompile the whole file. Do not edit `song.abc` with `sed`, Python, or
@@ -161,11 +190,21 @@ Common fixes:
 | `range` | move the degree by `+`/`-`, or set `vocal_octave` |
 | `grid` | use durations in 0.25-beat steps (0.125 minimum) |
 | long phrase | add `r:0.5` or `r:1` at a hemistich |
+| verse bars not a multiple of 4 | give each shatr 4 bars and each bayt 8; do not compress the bayt |
+| `CRAFT` line/bayt length | rewrite the `syl` ranges so each line owns its 4 bars |
+| no breath after a line | put `r:1.5` at the sadr end and `r:2` at the bayt end |
+| sadr cadences on `1` | end sadr on `2`, `4`, or `5`; keep `1` for the ajuz or section end |
+| both halves end alike | vary the ajuz degrees or use `vary:end-` on the cell |
+| register flat | lift the ajuz by 4–7 semitones, or write `5+`/`1+` at the climax |
+| no long notes | turn repeated `:.5` notes into `:1`/`:2` on key words and line ends |
+| too many fast notes | remove some `:.25` turns; keep one turn per phrase |
+| phrase opens wander | state a 4–6 note cell and reuse it with `vary:end-` |
+| phrase opens too literal | vary the tail, transpose (`+oct`, `shift:2`), or keep the rhythm and change the degrees |
 | no chorus lift | rewrite the chorus degrees higher in the same key; do not transpose the whole verse, which changes the maqam |
 | no call-and-response | leave vocal gaps and put an Ins motif in them |
 | Ins silent under vocal | add a sustained root or muted riff in some vocal bars |
 
-## 5. Release
+## 6. Release
 
 Deliver `song.abc` when:
 
@@ -173,6 +212,9 @@ Deliver `song.abc` when:
 - every bar sums correctly and both voices have the same bar count.
 - `syl` covers every vocal bar (or the user explicitly accepts a missing
   alignment), and no intake line is accidentally unused.
+- `CRAFT` has no flags: one bayt is eight bars, each line breathes, sadr and
+  ajuz cadences differ, the verse has a register arc, and the motif recurs
+  without being copied literally.
 - the chorus is measurably above the verse, and the vocal span fits one singer.
 - the file has the corpus header and no `w:` lines.
 
@@ -180,6 +222,8 @@ Deliver `song.abc` when:
 
 Full data: `assets/corpus_profile.json`; readable summary:
 `references/corpus.md`. Maqam degree tables and spelling: `references/maqam.md`.
+Prosody, phrase, cadence, and register rules: `references/vocal_craft.md`.
+Craft thresholds and their calibration: `assets/craft_thresholds.json`.
 
 | Metric | p10 | p50 | p90 |
 |---|---:|---:|---:|
@@ -211,15 +255,24 @@ Full data: `assets/corpus_profile.json`; readable summary:
 
 ## Composition guidance
 
-- **One lyric line ≈ 4 bars at 4/4** (2 bars for a short line). Keep a breath at
-  the hemistich and a longer rest at the couplet end.
-- **Register arc:** verse around MIDI 62-70, chorus 3-5 semitones higher,
+- **One shatr = 4 bars at 4/4** (2 bars for a short line); one bayt = two
+  shatrs = 8 bars. A breath `r:1.5` ends the sadr; `r:2` ends the bayt.
+- **Period, not a run-on:** the sadr asks, the ajuz answers. Sadr cadence on
+  `2`, `4`, or `5`; ajuz on `5`, or `1` only at a section/song end. Do not end
+  every phrase on the tonic.
+- **Motif:** state a 4–6 note cell with a clear rhythm. Repeat it with
+  `vary:end-`, `+oct`, or `shift:<n>`; do not copy the whole opening literally
+  in every phrase.
+- **Rhythm:** hold the important word and the line ending. Keep `:.25` turns
+  rare; a stream of fast notes erases the words. The `CRAFT` card reports the
+  long-note and fast-note shares.
+- **Register arc:** start the verse low, lift the ajuz 4–7 semitones, and save
+  an octave for one climax phrase. Chorus 3–5 semitones above the verse median;
   outro back down. A single singer should stay within about 20 semitones.
 - **Maqam identity:** for Kurd on D use `b2` (Eb), `b3` (F), `b6` (Bb), `b7`
   (C), and touch `1`; for Nahawand use `2` and `b3`; for Hijaz use `b2` and `3`.
-  End phrases on `1`, `4`, or `5` to make the qarar audible. The inspector
-  prints `MAQAM ... fit`; below 80% means the degrees drifted (usually a
-  natural `2`/`3` where Kurd wants `b2`/`b3`).
+  The inspector prints `MAQAM ... fit`; below 80% means the degrees drifted
+  (usually a natural `2`/`3` where Kurd wants `b2`/`b3`).
 - **Chorus:** change the chord loop or the rhythmic cell, not only the words.
   The lift should be heard, not just written.
 - **Instrumental:** a riff is 2-8 notes with a clear shape. Use `motifs` and

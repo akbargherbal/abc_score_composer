@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import os
 import re
 import sys
@@ -230,15 +229,15 @@ def normalize_kind(name: str) -> str:
     return "verse"
 
 
-def est_bars_for(syllables: int, tempo: int | None = None) -> int:
-    # 4 sung notes per bar is a comfortable, breathable density; the corpus
-    # overall average is about 3.8-4.7 notes per bar once rests are included.
-    dens = 4.0
-    if tempo and tempo >= 120:
-        dens = 4.8
-    elif tempo and tempo <= 75:
-        dens = 3.4
-    return max(2, int(math.ceil(syllables / dens)))
+def est_bars_for(syllables: int, tempo: int | None = None, role: str | None = None) -> int:
+    """Structural budget: one hemistich is four bars, one bayt is eight.
+
+    A very short line (eight syllables or fewer) gets two bars, the other
+    convention the corpus uses.  Tempo is kept in the signature for callers
+    that already pass it, but it no longer changes the budget: the defect this
+    guards against was fitting a whole bayt into the space of one shatr.
+    """
+    return 2 if syllables <= 8 else 4
 
 
 def main() -> int:
@@ -313,7 +312,10 @@ def main() -> int:
         # Ignore pure separators, but keep the lyric text itself.
         if re.fullmatch(r"[-—–_.…\s]+", line):
             continue
-        text_line = re.sub(r"\.{2,}\s*$", "", line).strip()
+        # A trailing ellipsis is the transcriber's usual mark for the second
+        # half of a bayt.  Capture it before stripping punctuation.
+        ellipsis = bool(re.search(r"(?:\.{2,}|…)\s*$", line))
+        text_line = re.sub(r"(?:\.{2,}|…)\s*$", "", line).strip()
         if not text_line:
             continue
         tokens, count, estimated = syllabify_line(text_line)
@@ -328,6 +330,9 @@ def main() -> int:
             "syllables": tokens,
             "count": count,
             "estimated": estimated,
+            "ellipsis": ellipsis,
+            "role": None,
+            "bayt": (idx + 1) // 2,
             "est_bars": est_bars_for(count, tempo),
         }
         current["lines"].append(line_id)
@@ -338,13 +343,28 @@ def main() -> int:
     for sec in sections:
         sec["line_count"] = len(sec["lines"])
         sec["couplets"] = sec["line_count"] // 2
+        # Prefer the ellipsis mark; if the section has none, alternate.  Either
+        # way a bayt is a sadr followed by an ajuz, never two lines of the
+        # same role.
+        sec_records = [r for r in line_records if r["section"] == sec["key"]]
+        has_ellipsis = any(r.get("ellipsis") for r in sec_records)
+        for pos, rec in enumerate(sec_records):
+            if has_ellipsis:
+                rec["role"] = "ajuz" if rec.get("ellipsis") else "sadr"
+            else:
+                rec["role"] = "sadr" if pos % 2 == 0 else "ajuz"
+            rec["bayt"] = pos // 2 + 1
+            rec["est_bars"] = est_bars_for(rec["count"], tempo, rec["role"])
+        sec["est_bars"] = sum(r["est_bars"] for r in sec_records)
         if sec["kind"] in ("intro", "outro", "interlude"):
             sec["est_bars"] = max(4, sec["est_bars"]) if sec["lines"] else 4
         if sec["kind"] in ("chorus", "verse") and sec["est_bars"] < 4:
             sec["est_bars"] = 4
+        sec["bayts"] = sum(1 for r in sec_records if r["role"] == "ajuz")
 
     totals = {
         "lines": len(line_records),
+        "bayts": sum(1 for r in line_records if r["role"] == "ajuz"),
         "syllables": sum(r["count"] for r in line_records),
         "est_bars": sum(s["est_bars"] for s in sections),
         "sections": len(sections),
@@ -385,16 +405,19 @@ def main() -> int:
 
     print(f"STYLE maqam={style.get('maqam')} mood={style.get('mood')!r} tempo={tempo}")
     print(f"SECTIONS {totals['sections']}  LINES {totals['lines']}  "
-          f"SYLLABLES {totals['syllables']}  EST_BARS {totals['est_bars']}")
+          f"BAYTS {totals['bayts']}  SYLLABLES {totals['syllables']}  "
+          f"EST_BARS {totals['est_bars']}")
     for sec in sections:
         print(f"\n[{sec['name']}] key={sec['key']} kind={sec['kind']} "
-              f"lines={sec['line_count']} syl={sec['syllables']} bars~{sec['est_bars']}")
+              f"lines={sec['line_count']} bayts={sec['bayts']} syl={sec['syllables']} "
+              f"bars~{sec['est_bars']}")
         if sec["cues"]:
             print(f"  cues: {sec['cues']}")
         for lid in sec["lines"]:
             r = next(x for x in line_records if x["id"] == lid)
             est = " estimated" if r["estimated"] else ""
-            print(f"  {r['id']:18s} {r['count']:3d} syl  ~{r['est_bars']} bars{est}  {r['text'][:60]}")
+            print(f"  {r['id']:18s} {r['role']:4s} bayt {r['bayt']} "
+                  f"{r['count']:3d} syl  ~{r['est_bars']} bars{est}  {r['text'][:60]}")
     if reference:
         print(f"\nREFERENCE tempo p50={reference['tempo_p50']}  "
               f"bars p50={reference['bars_per_song_p50']}  "

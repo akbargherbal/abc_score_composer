@@ -1,0 +1,134 @@
+X:1
+T:
+M:4/4
+L:1/16
+Q:1/4=80
+V: Vocal clef=treble name="Vocal Melody" snm="Vocal"
+V: Ins clef=treble name="Ins Melody" snm="Inst."
+K:Dm
+% intro — guitar alone states the cell
+V: Vocal
+Z|Z|Z|Z|
+V: Ins
+D,4 D,2 A,2 F,2 _E,2 D,4|D,4 A,2 D,2 G,2 F,2 _E,2 D,2|D,2 D,2 A,2 D,2 F,4 _E,2 D,2|D,4 A,4 G,2 F,2 _E,4|
+V: Vocal
+Z|Z|
+V: Ins
+D,4 A,2 c2 A,2 G,2 F,2 D,2|D,4 _E,2 D,2 z8|
+% intro voice — the guitar drops
+V: Vocal
+A2 A2 c2 B2 B1 B1 A2 z4|G2 F2 _E2 D2 D2 F2 G2 A2|B2 A2 G2 G2 A1 A1 A2 z4|A2 A2 c2 B2 A2 G2 F2 G2|
+V: Ins
+Z|Z|Z|Z|
+V: Vocal
+A2 A2 G2 _E2 D2 D1 D1 d2-d2|
+V: Ins
+Z|
+% link — guitar answers the qafla
+V: Vocal
+Z|
+V: Ins
+D,4 A,2 D,2 F,4 _E,2 D,2|
+% verse 1
+V: Vocal
+z2 B1 A1 A2 c2 c2 A4 z2|G1 F1 G2 F2 F2 _E2 z6|d1 c1 D2 c2 c2 A1 A1 c4 z2|z2 B1 A1 A2 c2 B2 B1 B1 z4|
+V: Ins
+Z|z8z2 D,2 F,2 G,2|Z|Z|
+V: Vocal
+G1 F1 F2 _E2 D2 A1 A1 G1 A1 z4|z2 B1 A1 A2 c2 B2 A2 G2 F2|B1 A1 G2 F2 F2 G1 G1 G4 z2|z2 G1 F1 F2 G2 A2 B2 A2 G2|
+V: Ins
+Z|Z|Z|Z|
+V: Vocal
+G1 F1 F2 _E2 D2 D2 _E1 F1 z4|z2 B1 A1 A2 c2 B2 A2 G2 F2|A1 G1 G2 F2 _E2 c2 A2 G1 A1 z2|z2 d1 c1 D2 c2 c2 A2 G2 A2|
+V: Ins
+z12 D,1 F,1 G,2|Z|Z|Z|
+V: Vocal
+c1 B1 A2 G2 G2 c1 c1 A1 c1 z4|z2 B1 A1 A2 c2 B2 A2 G2 F2|B1 A1 B2 A2 A2 B1 A1 A4 z2|z2 B1 A1 A2 c2 B1 B1 A4 z2|
+V: Ins
+Z|Z|Z|Z|
+V: Vocal
+G1 F1 G2 A2 A2 A2 z6|A1 G1 F2 _E2 D1 D1 G2 c2 z4|z2 B1 A1 A2 c2 B2 A2 G2 F2|B1 A1 G2 F2 _E2 F1 F1 F2 z4|
+V: Ins
+z8z2 A,2 c2 A,2|Z|Z|Z|
+V: Vocal
+z2 B1 A1 A2 c2 B2 A2 G2 F2|B1 A1 G2 F2 _E2 D1 D1 d6|
+V: Ins
+Z|Z|
+% drop — one bar of pedal, one bar of silence
+V: Vocal
+Z|Z|
+V: Ins
+D,4 D,4 _E,2 D,2 F,4|z16|
+% chorus — the lift, guitar out
+V: Vocal
+_e1 d1 f2 _e2 d2 d2 d2 d4|g1 f1 f2 _e2 d2 c2 d4 z2|g1 f1 g2 a2 a2 f1 _e1 g1 f1 z4|z2 d1 c1 d2 c2 c1 c1 B2 G2 A2|
+V: Ins
+Z|Z|Z|Z|
+V: Vocal
+c1 B1 A2 G2 F2 D1 D1 c2 d4|
+V: Ins
+Z|
+% interlude — the guitar develops the cell
+V: Vocal
+Z|Z|Z|Z|
+V: Ins
+D2 A2 D2 F2 _E2 D2 A,2 D,2|D2 A2 c2 A2 G2 F2 _E2 D2|F2 G2 A2 c2 B2 A2 G2 F2|_E4 D4 z8|
+% verse 2
+V: Vocal
+z2 B1 A1 A2 c2 B2 A2 G2 F2|B1 A1 G2 F2 _E2 A1 A1 G1 A1 z4|B1 A1 A2 c2 B2 A2 G2 F2 z2|A2 B2 A2 G2 D1 D1 c1 d1 z4|
+V: Ins
+Z|Z|Z|Z|
+V: Vocal
+z2 c2 D2 c2 c2 A2 G2 A2|B2 A2 G2 F2 _E1 F1 G1 F1 F2 z2|z2 A2 A2 c2 B2 A2 G2 z2|G2 G2 F2 _E2 B1 A1 A1 B1 z4|
+V: Ins
+Z|Z|Z|Z|
+V: Vocal
+z2 A2 A2 c2 B2 A4 z2|A2 B2 c2 d2 c2 c2 A2 z2|G2 A2 c2 d2 f1 f1 g2 a2 z2|z2 a2 a2 g2 f2 _e2 d2 z2|
+V: Ins
+Z|Z|Z|Z|
+V: Vocal
+B2 A2 G2 D1 D1 c2 d2 z4|z2 A2 A2 c2 B2 A2 G2 F2|A2 G2 F2 _E2 A1 A1 G1 A1 z4|z2 A2 A2 c2 B2 A2 G2 F2|
+V: Ins
+Z|Z|z12 D,1 F,1 G,2|Z|
+V: Vocal
+A2 B2 A2 G2 F2 D1 D1 c1 d1 z2|
+V: Ins
+Z|
+% push — guitar builds, then a hole
+V: Vocal
+Z|Z|
+V: Ins
+D,4 D,4 _E,2 D,2 F,4|G,2 F,2 _E,2 D,2 z8|
+% chorus 2
+V: Vocal
+d2 f2 _e2 d2 c2 d2 d4|f2 f2 _e2 d2 c2 d4 z2|f2 g2 a2 a2 f1 _e1 g1 f1 z4|z2 c2 d2 c2 c1 c1 B2 G2 A2|
+V: Ins
+Z|Z|Z|Z|
+V: Vocal
+B2 A2 G2 F2 D1 D1 d6|
+V: Ins
+Z|
+% solo — voice out, the cell fragments
+V: Vocal
+Z|Z|Z|Z|
+V: Ins
+D2 A2 c2 A2 G2 F2 _E2 D2|D2 A2 c2 d2 c2 A2 G2 F2|G2 A2 B2 c2 d2 c2 A2 G2|F2 _E2 D2 A,2 D2 F2 A2 d2|
+V: Vocal
+Z|Z|Z|
+V: Ins
+c2 B2 A2 G2 F2 _E2 D2 A,2|D4 A4 z8|_E4 D4 z8|
+% outro — voice alone, the cell returns low
+V: Vocal
+z2 F2 F2 G2 A2 G2 _E2 D2|F2 G2 F2 _E2 D1 D1 c1 f1 z4|A2 A2 c2 B2 A2 G2 F2 z2|A2 G1 F1 _E2 D1 D1 D8|
+V: Ins
+Z|Z|Z|Z|
+% tag — the guitar closes
+V: Vocal
+Z|
+V: Ins
+D,8 z8|
+% final rest
+V: Vocal
+Z|
+V: Ins
+Z|

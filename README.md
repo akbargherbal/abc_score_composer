@@ -11,6 +11,14 @@ patch-by-patch workflow. The old architecture mixed composition with notation
 repair; this one separates them: the model composes, the compiler and
 inspector measure, and the model patches the Blueprint rather than the ABC.
 
+Version 0.2.0 adds the missing **vocal craft** layer. The corpus can measure a
+transcription, but it has no lyrics, so it cannot tell whether a tune follows
+the words. The new `CRAFT` check measures phrase length, cadence, breath,
+register arc, long/fast note balance, and motif reuse. It is calibrated on four
+hand-labelled scores: one singable (`tests/fixtures/excellent.txt`) and three
+with the aimless-scalar defect (`07`, `11`, `16`). The rules, terminology, and
+a worked eight-bar bayt are in `references/vocal_craft.md`.
+
 ## Quick start
 
 ```bash
@@ -62,13 +70,17 @@ python3 scripts/mine_corpus.py --corpus /path/to/670_arabic_songs_abc_scores \
 ABC2MIDI=/path/to/abc2midi python3 tests/test_roundtrip.py
 ```
 
-The tests cover Arabic syllabification, the unvocalized fallback, a full
-compile/validate round trip, bar-sum/chord/syllable rejection, and a miner
-smoke test.
+The tests cover Arabic syllabification and sadr/ajuz roles, the unvocalized
+fallback, a full compile/validate round trip, the report `line_map`,
+bar-sum/chord/syllable rejection, craft separation on the four reference
+scores, and a miner smoke test.
 
 ## Files
 
 - `SKILL.md` — the workflow the model follows.
-- `references/blueprint_schema.md` — full Blueprint schema and error codes.
+- `references/blueprint_schema.md` — full Blueprint schema, `line_map`, and error codes.
+- `references/vocal_craft.md` — prosody, phrase, cadence, motif, register rules.
 - `references/corpus.md` — corpus percentiles, forms, chord loops, riffs.
-- `assets/example_*` — a working 18-bar example (prompt, intake, Blueprint, ABC).
+- `assets/craft_thresholds.json` — provisional craft thresholds and calibration.
+- `assets/example_*` — a working 30-bar example (prompt, intake, Blueprint, ABC).
+- `tests/fixtures/` — the one good and three defective reference scores.

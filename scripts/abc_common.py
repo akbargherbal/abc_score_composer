@@ -488,7 +488,11 @@ def parse_abc(path_or_text: str, is_text: bool = False) -> dict:
                 )
             n = parsed.pop("multi", 1)
             for _ in range(n):
-                voices[current_voice].append(dict(parsed))
+                copy_bar = dict(parsed)
+                # Keep the source music line so the craft checks can recover the
+                # transcriber's own phrase breaks in files with no Blueprint.
+                copy_bar["line"] = lineno
+                voices[current_voice].append(copy_bar)
 
     return {
         "header": header,

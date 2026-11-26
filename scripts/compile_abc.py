@@ -36,6 +36,12 @@ CHORD_RE = re.compile(
     r"^([A-G][#b]?)(" + "|".join(re.escape(q) for q in sorted(CHORD_QUALITIES, key=len, reverse=True)) + r")?(?:/([A-G][#b]?))?$"
 )
 
+# Semitones above the tonic -> the degree label used in Blueprint notes.
+DEGREE_BY_PC = {
+    0: "1", 1: "b2", 2: "2", 3: "b3", 4: "3", 5: "4",
+    6: "#4", 7: "5", 8: "b6", 9: "6", 10: "b7", 11: "7",
+}
+
 
 
 class CompileError(Exception):
@@ -398,6 +404,26 @@ def build_line_map(intake: dict | None) -> dict:
     return {line["id"]: line for line in intake.get("lines", [])}
 
 
+def line_refs(syl) -> list[str]:
+    """Unique intake line ids referenced by a bar's syl field, in order."""
+    if syl is None:
+        return []
+    tokens = []
+    if isinstance(syl, list):
+        for item in syl:
+            tokens.extend(str(item).split())
+    else:
+        tokens = str(syl).split()
+    seen = []
+    for tok in tokens:
+        if not tok.startswith("@"):
+            continue
+        m = re.match(r"^@([^:]+)", tok)
+        if m and m.group(1) not in seen:
+            seen.append(m.group(1))
+    return seen
+
+
 def resolve_syllables(syl, line_map: dict, used: dict | None = None) -> list[str] | None:
     if syl is None:
         return None
@@ -572,6 +598,7 @@ def compile_blueprint(bp: dict, intake: dict | None = None, strict: bool = False
                     "ins": ins_events,
                     "syls": syls,
                     "groups": groups,
+                    "line_ids": line_refs(rawbar.get("syl")),
                 })
                 all_events.extend(voc_events)
                 all_events.extend(ins_events)
@@ -825,6 +852,61 @@ def compile_blueprint(bp: dict, intake: dict | None = None, strict: bool = False
             "msg": f"{len(partial_lines)} intake lines are only partly used",
         })
 
+    # Per-line map: which bars carry each intake line, and how the line ends.
+    # This changes no ABC; it gives the inspector the prosodic structure that
+    # an external ABC cannot carry without w: lines.
+    def leading_rest(events) -> float:
+        total = 0.0
+        for ev in events:
+            if ev["type"] == "note":
+                break
+            total += float(ev["dur"])
+        return total
+
+    def trailing_rest(events) -> float:
+        total = 0.0
+        for ev in reversed(events):
+            if ev["type"] == "note":
+                break
+            total += float(ev["dur"])
+        return total
+
+    line_report = []
+    global_bar = 0
+    for sec in compiled_sections:
+        per_line: dict[str, list[tuple[int, dict]]] = {}
+        for bi, bar in enumerate(sec["bars"]):
+            for lid in bar.get("line_ids", []):
+                per_line.setdefault(lid, []).append((bi, bar))
+        for lid, hits in per_line.items():
+            bars = [bar for _, bar in hits]
+            notes = [ev for bar in bars for ev in bar["voc"] if ev["type"] == "note"]
+            first = bars[0]["voc"]
+            last = bars[-1]["voc"]
+            rec = line_map.get(lid, {})
+            cadence_pc = ((notes[-1]["midi"] - key_info["tonic_pc"]) % 12) if notes else None
+            line_report.append({
+                "line": lid,
+                "section": sec["id"],
+                "kind": sec["kind"],
+                "role": rec.get("role"),
+                "bayt": rec.get("bayt"),
+                "start_bar": global_bar + hits[0][0] + 1,
+                "end_bar": global_bar + hits[-1][0] + 1,
+                "bars": len({bi for bi, _ in hits}),
+                "lyric_count": len(rec.get("syllables") or []),
+                "notes": len(notes),
+                "melisma": round(len(notes) / len(rec["syllables"]), 2) if rec.get("syllables") else None,
+                "median": round(sorted(ev["midi"] for ev in notes)[len(notes) // 2], 2) if notes else None,
+                "cadence_pc": cadence_pc,
+                "cadence_degree": DEGREE_BY_PC.get(cadence_pc),
+                "lead_rest": round(leading_rest(first), 2),
+                "end_rest": round(trailing_rest(last), 2),
+                "end_pitch": notes[-1]["midi"] if notes else None,
+            })
+        global_bar += len(sec["bars"])
+    line_report.sort(key=lambda r: r["start_bar"])
+
     report = {
         "ok": True,
         "meta": {
@@ -849,6 +931,7 @@ def compile_blueprint(bp: dict, intake: dict | None = None, strict: bool = False
             "missing_lines": missing_lines,
             "partial_lines": partial_lines,
         },
+        "line_map": line_report,
         "errors": [],
         "warnings": warnings,
     }

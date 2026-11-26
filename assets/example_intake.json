@@ -35,12 +35,14 @@
       "kind": "verse",
       "cues": "dark brooding vocals | muted rhythmic guitars and heavy bass",
       "lines": [
-        "verse_1.L1"
+        "verse_1.L1",
+        "verse_1.L2"
       ],
-      "couplets": 0,
-      "syllables": 16,
-      "est_bars": 4,
-      "line_count": 1
+      "couplets": 1,
+      "syllables": 28,
+      "est_bars": 8,
+      "line_count": 2,
+      "bayts": 1
     },
     {
       "index": 1,
@@ -49,12 +51,14 @@
       "kind": "chorus",
       "cues": "anguished powerful vocals | heavy orchestral swell and distorted guitars — Kurd",
       "lines": [
-        "chorus.L1"
+        "chorus.L1",
+        "chorus.L2"
       ],
-      "couplets": 0,
-      "syllables": 16,
-      "est_bars": 4,
-      "line_count": 1
+      "couplets": 1,
+      "syllables": 29,
+      "est_bars": 8,
+      "line_count": 2,
+      "bayts": 1
     },
     {
       "index": 2,
@@ -63,12 +67,14 @@
       "kind": "outro",
       "cues": "deep male vocals | clean electric guitar",
       "lines": [
-        "outro.L1"
+        "outro.L1",
+        "outro.L2"
       ],
-      "couplets": 0,
-      "syllables": 14,
-      "est_bars": 4,
-      "line_count": 1
+      "couplets": 1,
+      "syllables": 28,
+      "est_bars": 8,
+      "line_count": 2,
+      "bayts": 1
     }
   ],
   "lines": [
@@ -98,6 +104,36 @@
       ],
       "count": 16,
       "estimated": false,
+      "ellipsis": false,
+      "role": "sadr",
+      "bayt": 1,
+      "est_bars": 4
+    },
+    {
+      "id": "verse_1.L2",
+      "section": "verse_1",
+      "section_name": "Verse 1",
+      "index": 2,
+      "text": "يُجَرَّعُ مِنْهَا مَا أُجَرَّعُهُ",
+      "syllables": [
+        "يُ",
+        "جَ",
+        "رَّ",
+        "عُ",
+        "مِنْ",
+        "هَا",
+        "مَا",
+        "أُ",
+        "جَ",
+        "رَّ",
+        "عُ",
+        "هُ"
+      ],
+      "count": 12,
+      "estimated": false,
+      "ellipsis": true,
+      "role": "ajuz",
+      "bayt": 1,
       "est_bars": 4
     },
     {
@@ -126,6 +162,37 @@
       ],
       "count": 16,
       "estimated": false,
+      "ellipsis": false,
+      "role": "sadr",
+      "bayt": 1,
+      "est_bars": 4
+    },
+    {
+      "id": "chorus.L2",
+      "section": "chorus",
+      "section_name": "Chorus",
+      "index": 2,
+      "text": "وَلَا أَنَّ بِي الْأَيَّامَ تَفْجَعُهُ",
+      "syllables": [
+        "وَ",
+        "لَا",
+        "أَ",
+        "نَّ",
+        "بِي",
+        "الْ",
+        "أَ",
+        "يَّ",
+        "امَ",
+        "تَفْ",
+        "جَ",
+        "عُ",
+        "هُ"
+      ],
+      "count": 13,
+      "estimated": false,
+      "ellipsis": true,
+      "role": "ajuz",
+      "bayt": 1,
       "est_bars": 4
     },
     {
@@ -152,13 +219,46 @@
       ],
       "count": 14,
       "estimated": false,
+      "ellipsis": false,
+      "role": "sadr",
+      "bayt": 1,
+      "est_bars": 4
+    },
+    {
+      "id": "outro.L2",
+      "section": "outro",
+      "section_name": "Outro",
+      "index": 2,
+      "text": "فَلَمْ أُوَقَّ ٱلَّذِي قَدْ كُنْتُ أَجْزَعُهُ",
+      "syllables": [
+        "فَ",
+        "لَمْ",
+        "أُ",
+        "وَ",
+        "قَّ",
+        "ٱلَّ",
+        "ذِي",
+        "قَدْ",
+        "كُنْ",
+        "تُ",
+        "أَجْ",
+        "زَ",
+        "عُ",
+        "هُ"
+      ],
+      "count": 14,
+      "estimated": false,
+      "ellipsis": true,
+      "role": "ajuz",
+      "bayt": 1,
       "est_bars": 4
     }
   ],
   "totals": {
-    "lines": 3,
-    "syllables": 46,
-    "est_bars": 12,
+    "lines": 6,
+    "bayts": 3,
+    "syllables": 85,
+    "est_bars": 24,
     "sections": 3,
     "estimated_lines": 0
   },
