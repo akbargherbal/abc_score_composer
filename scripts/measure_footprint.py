@@ -71,14 +71,24 @@ def payload_per_bar(blueprint: dict, bars: int) -> float:
 
 
 def mandatory_files(root: str) -> list[str]:
-    return [
+    """Files the agent must read before the first Blueprint.
+
+    From v0.2.2 the example is skeleton + fill, so the full Blueprint is only
+    an optional format reference.  Before that, the full Blueprint was the
+    working example.
+    """
+    files = [
         "SKILL.md",
         "references/blueprint_schema.md",
         "assets/example_prompt.txt",
         "assets/example_intake.json",
-        "assets/example_blueprint.json",
-        "assets/example_song.abc",
     ]
+    if os.path.exists(os.path.join(root, "assets", "example_fill.json")):
+        files += ["assets/example_blueprint_skeleton.json", "assets/example_fill.json"]
+    else:
+        files += ["assets/example_blueprint.json"]
+    files += ["assets/example_song.abc"]
+    return files
 
 
 def run_compile(root: str, tmp: str) -> tuple[str, str]:
@@ -162,6 +172,12 @@ def measure(root: str, label: str, binary: str | None) -> dict:
     bars = count_bars(bp)
     payload = payload_per_bar(bp, bars)
 
+    fill_path = os.path.join(root, "assets", "example_fill.json")
+    agent_path = fill_path if os.path.exists(fill_path) else bp_path
+    skel_path = os.path.join(root, "assets", "example_blueprint_skeleton.json")
+    agent_bytes = size(agent_path)
+    skeleton_bytes = size(skel_path)
+
     tmp = tempfile.mkdtemp(prefix="abc_footprint_")
     try:
         abc, rv = run_compile(root, tmp)
@@ -179,6 +195,9 @@ def measure(root: str, label: str, binary: str | None) -> dict:
         "mandatory_words": mandatory_words,
         "blueprint_bytes": size(bp_path),
         "blueprint_bars": bars,
+        "agent_write_bytes": agent_bytes,
+        "agent_write_file": os.path.relpath(agent_path, root),
+        "skeleton_bytes": skeleton_bytes,
         "agent_payload_bytes_per_bar": round(payload, 1),
         "card_ok_words": card_ok,
         "card_fail_words": card_fail,
@@ -199,11 +218,12 @@ def main() -> int:
         print(json.dumps(data, ensure_ascii=False, indent=2))
         return 0
     print(f"{'label':10s} {'skill_B':>8s} {'skill_W':>8s} {'mand_B':>8s} "
-          f"{'mand_W':>8s} {'bp_B':>7s} {'bars':>5s} {'B/bar':>7s} "
-          f"{'ok_W':>6s} {'fail_W':>7s}")
+          f"{'mand_W':>8s} {'bp_B':>7s} {'skel_B':>7s} {'agent_B':>7s} "
+          f"{'bars':>5s} {'B/bar':>7s} {'ok_W':>6s} {'fail_W':>7s}")
     print(f"{data['label']:10s} {data['skill_bytes']:8d} {data['skill_words']:8d} "
           f"{data['mandatory_bytes']:8d} {data['mandatory_words']:8d} "
-          f"{data['blueprint_bytes']:7d} {data['blueprint_bars']:5d} "
+          f"{data['blueprint_bytes']:7d} {data['skeleton_bytes']:7d} "
+          f"{data['agent_write_bytes']:7d} {data['blueprint_bars']:5d} "
           f"{data['agent_payload_bytes_per_bar']:7.1f} "
           f"{data['card_ok_words']:6d} {data['card_fail_words']:7d}")
     return 0
