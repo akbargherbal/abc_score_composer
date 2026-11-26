@@ -26,7 +26,8 @@ structural problem survives two rounds, stop and report it.
 ## 1. Intake
 
 ```bash
-python3 <skill>/scripts/intake_lyrics.py --in prompt.txt -o intake.json
+python3 <skill>/scripts/intake_lyrics.py --in prompt.txt -o intake.json \
+  --skeleton blueprint_skeleton.json
 ```
 
 Read the printed table. Each line gets an id (`verse_1.L1`), a role (`sadr` or
@@ -34,31 +35,19 @@ Read the printed table. Each line gets an id (`verse_1.L1`), a role (`sadr` or
 role comes from a trailing `...`, otherwise it alternates. Arabic with
 *tashkeel* is counted from the vowel marks; unvocalized lines are `estimated`.
 
+`blueprint_skeleton.json` already contains the sections, bars, `ch`, and `syl`
+ranges, including `same_as` for a repeated chorus. **Fill only `voc` and `ins`.**
+Do not retype `ch` or `syl`.
+
 ## 2. Write the Blueprint
 
-One JSON file. Think form, chords, register, rhythm, melisma, call-and-response.
-Do not write ABC, do bar arithmetic, or compute pitches by hand.
+One JSON file, starting from the skeleton. Think register, rhythm, melisma, and
+call-and-response. Do not write ABC, do bar arithmetic, or compute pitches by
+hand.
 
 Full schema and error codes: `references/blueprint_schema.md`. Working example:
-`assets/example_blueprint.json` with its intake and compiled ABC.
+`assets/example_blueprint.json` with its skeleton, intake, and compiled ABC.
 
-```json
-{
-  "meta": {"key": "Dm", "maqam": "kurd", "meter": "4/4", "tempo": 84,
-           "targets": {"melisma": 1.2, "chorus_lift": 3, "call_response": 0.6}},
-  "motifs": {"R1": {"ins": "1:.5 b2:.5 1:.5 b7-:.5 1:2"}},
-  "sections": [
-    {"id": "v1", "kind": "verse", "bars": [
-      {"ch": "Dm", "syl": "@verse_1.L1:1-4",
-       "voc": "1:.5 b2:.5 1:2 b3:1", "ins": "rest"},
-      {"ch": "Gm", "syl": "@verse_1.L1:5-8",
-       "voc": "b3:.5 4:.5 4:1 b2:2", "ins": "1:4"}
-    ]},
-    {"id": "c1", "kind": "chorus", "same_as": "v1",
-     "syl": ["@chorus.L1:1-4", "@chorus.L1:5-8"]}
-  ]
-}
-```
 
 - `meta.key` is plain major/minor (`Dm`, `F#`); the maqam is a label and the
   degrees decide pitches. `vocal_octave`/`instrument_octave` shift a voice.
@@ -87,10 +76,12 @@ python3 <skill>/scripts/validate_and_inspect.py song.abc \
 
 Compile writes `song.abc` only when bar sums and voice alignment pass.
 `--strict` requires `syl` on every vocal bar. The validation file has temporary
-`w:` placeholders; the delivered ABC has none.
+`w:` placeholders; the delivered ABC has none. A verse that is not whole bayts
+fails with `bad_verse_bars`; the compiler also inserts the missing breath
+(`r:1.5` after a sadr, `r:2` after an ajuz).
 
 - `ERRORS` are structural (`bar_sum`, `syl_mismatch`, `bad_chord`, `range`,
-  `grid`, `bad_motif`). Fix the Blueprint and recompile.
+  `grid`, `bad_motif`, `bad_verse_bars`). Fix the Blueprint and recompile.
 - `FLAGS` are corpus extremes/target misses; musical, not syntax.
 - `CRAFT` checks line length, breath, cadence, and long-note share. Advisory
   unless `meta.targets.craft` is true and you pass `--strict`.

@@ -1,8 +1,12 @@
-classical arabic, melismatic, tarab, symphonic metal, Maqam Kurd, mood: "somber, night dread"
+classical arabic, melismatic, tarab, symphonic metal, Maqam Kurd, mood: "somber, night dread", 84 BPM
+
+[Intro | single clean guitar | close-mic'd, plate reverb, short decay]
 
 [Verse 1 | dark brooding vocals | muted rhythmic guitars and heavy bass]
 اعْتَضْتُ مِنْ وَجْهِ خِلِّي بَعْدَ فُرْقَتِهِ كَأْسًا
 يُجَرَّعُ مِنْهَا مَا أُجَرَّعُهُ...
+
+[Interlude | guitar answers the qafla]
 
 [Chorus | anguished powerful vocals | heavy orchestral swell and distorted guitars — Kurd]
 مَا كُنْتُ أَحْسَبُ أَنَّ الدَّهْرَ يَفْجَعُنِي بِهِ

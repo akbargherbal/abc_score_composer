@@ -26,7 +26,9 @@ import sys
 import unicodedata
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from abc_common import load_json  # noqa: E402
+from abc_common import (  # noqa: E402
+    degree_to_midi, load_json, midi_to_name, parse_key,
+)
 
 # Arabic short vowels and related marks.
 FATHA = "\u064E"
@@ -240,12 +242,122 @@ def est_bars_for(syllables: int, tempo: int | None = None, role: str | None = No
     return 2 if syllables <= 8 else 4
 
 
+def _chord_root(degree: str, key_info: dict) -> str:
+    midi, _letter, _norm = degree_to_midi(degree, key_info)
+    name = midi_to_name(midi, prefer_flats=key_info["prefer_flats"])
+    return re.sub(r"-?\d+$", "", name)
+
+
+def chord_loop(key: str) -> list[str]:
+    """A corpus-common one-chord-per-bar loop: i-iv-VI-V or I-vi-IV-V."""
+    info = parse_key(key)
+    if info["minor"]:
+        specs = [("1", "m"), ("4", "m"), ("b6", ""), ("5", "")]
+    else:
+        specs = [("1", ""), ("6", "m"), ("4", ""), ("5", "")]
+    return [_chord_root(deg, info) + quality for deg, quality in specs]
+
+
+def bar_syllable_ranges(line_id: str, count: int, bars: int) -> list[str]:
+    """Split a line's syllables over its bars, balancing the remainder."""
+    bars = max(1, min(bars, count))
+    base, rem = divmod(count, bars)
+    left, right = (rem + 1) // 2, rem // 2
+    sizes = [base] * bars
+    for i in range(left):
+        sizes[i] += 1
+    for i in range(right):
+        sizes[bars - 1 - i] += 1
+    out, start = [], 1
+    for n in sizes:
+        if n:
+            out.append(f"@{line_id}:{start}-{start + n - 1}")
+            start += n
+    return out
+
+
+def build_skeleton(out: dict) -> dict:
+    """Fill the mechanical parts: sections, bars, ch, and syl ranges."""
+    style = out.get("style") or {}
+    key = style.get("suggested_key") or "Dm"
+    loop = chord_loop(key)
+    meta = {
+        "key": key,
+        "maqam": (style.get("maqam") or "").lower() or None,
+        "meter": "4/4",
+        "tempo": style.get("tempo_default") or style.get("tempo_hint") or 90,
+        "vocal_octave": 0,
+        "targets": {
+            "melisma": 1.2,
+            "chorus_lift": 3,
+            "call_response": 0.6,
+            "vocal_span": 20,
+            "max_phrase_seconds": 12,
+            "maqam_fit": 0.8,
+        },
+    }
+    if meta["maqam"] is None:
+        meta.pop("maqam")
+
+    line_by_id = {r["id"]: r for r in out.get("lines") or []}
+    sections = []
+    used_sources = {}
+    for sec in out.get("sections") or []:
+        # Only exact repeated names (Chorus, Chorus) share music.  Verse 1 and
+        # Verse 2 are different verses even though both are "verse" sections.
+        base = sec["name"].strip().lower()
+        sec_lines = [line_by_id[x] for x in sec["lines"] if x in line_by_id]
+        source = used_sources.get(base)
+        if (source and source["kind"] == sec["kind"]
+                and source["line_count"] == len(sec_lines)):
+            entry = {
+                "id": sec["key"],
+                "kind": sec["kind"],
+                "same_as": source["id"],
+            }
+            if sec_lines:
+                entry["syl"] = [
+                    rng
+                    for rec in sec_lines
+                    for rng in bar_syllable_ranges(rec["id"], rec["count"], rec["est_bars"])
+                ]
+            sections.append(entry)
+            continue
+
+        bars = []
+        if sec_lines:
+            for rec in sec_lines:
+                ranges = bar_syllable_ranges(rec["id"], rec["count"], rec["est_bars"])
+                for rng in ranges:
+                    bars.append({"ch": loop[len(bars) % len(loop)], "syl": rng})
+        else:
+            for i in range(max(1, int(sec.get("est_bars") or 4))):
+                bars.append({"ch": loop[i % len(loop)]})
+        if bars and sec["kind"] == "outro":
+            tonic = re.sub(r"-?\d+$", "",
+                           midi_to_name(parse_key(key)["tonic_midi"],
+                                        prefer_flats=parse_key(key)["prefer_flats"]))
+            bars[-1]["ch"] = tonic + ("m" if parse_key(key)["minor"] else "")
+        sections.append({
+            "id": sec["key"],
+            "kind": sec["kind"],
+            "bars": bars,
+        })
+        used_sources[base] = {"id": sec["key"], "kind": sec["kind"],
+                              "line_count": len(sec_lines)}
+
+    return {"meta": meta, "motifs": {}, "sections": sections}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--in", dest="inp", required=True, help="prompt file, or - for stdin")
     ap.add_argument("-o", "--out", default="intake.json")
     ap.add_argument("--profile", default=None,
                     help="corpus_profile.json (default: ../assets/corpus_profile.json)")
+    ap.add_argument("--skeleton", default=None,
+                    help="write the mechanical Blueprint skeleton here "
+                         "(default: blueprint_skeleton.json beside -o)")
     ap.add_argument("--json", action="store_true", help="print full JSON to stdout")
     ap.add_argument("--pretty", action="store_true")
     args = ap.parse_args()
@@ -357,7 +469,8 @@ def main() -> int:
             rec["est_bars"] = est_bars_for(rec["count"], tempo, rec["role"])
         sec["est_bars"] = sum(r["est_bars"] for r in sec_records)
         if sec["kind"] in ("intro", "outro", "interlude"):
-            sec["est_bars"] = max(4, sec["est_bars"]) if sec["lines"] else 4
+            empty_bars = {"interlude": 2, "silence": 1}.get(sec["kind"], 4)
+            sec["est_bars"] = max(4, sec["est_bars"]) if sec["lines"] else empty_bars
         if sec["kind"] in ("chorus", "verse") and sec["est_bars"] < 4:
             sec["est_bars"] = 4
         sec["bayts"] = sum(1 for r in sec_records if r["role"] == "ajuz")
@@ -399,6 +512,13 @@ def main() -> int:
         json.dump(out, f, ensure_ascii=False, indent=2, sort_keys=False)
         f.write("\n")
 
+    skeleton_path = args.skeleton or os.path.join(
+        os.path.dirname(os.path.abspath(args.out)), "blueprint_skeleton.json")
+    skeleton = build_skeleton(out)
+    with open(skeleton_path, "w", encoding="utf-8") as f:
+        json.dump(skeleton, f, ensure_ascii=False, indent=2, sort_keys=False)
+        f.write("\n")
+
     if args.json:
         print(json.dumps(out, ensure_ascii=False, indent=2 if args.pretty else None))
         return 0
@@ -407,6 +527,7 @@ def main() -> int:
     print(f"SECTIONS {totals['sections']}  LINES {totals['lines']}  "
           f"BAYTS {totals['bayts']}  SYLLABLES {totals['syllables']}  "
           f"EST_BARS {totals['est_bars']}")
+    print(f"SKELETON {skeleton_path}  (fill only voc/ins)")
     for sec in sections:
         print(f"\n[{sec['name']}] key={sec['key']} kind={sec['kind']} "
               f"lines={sec['line_count']} bayts={sec['bayts']} syl={sec['syllables']} "

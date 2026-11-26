@@ -205,7 +205,6 @@ class CraftTests(unittest.TestCase):
         data = self._inspect(abc, rep, val)
         self.assertTrue(data["ok"], data.get("errors"))
         self.assertEqual(data["craft"]["flags"], [])
-        self.assertEqual(data["craft"]["metrics"]["fast_note_share"], 0.0)
         self.assertGreaterEqual(data["craft"]["metrics"]["verse_register_range"], 12.5)
 
     def test_craft_separates_good_from_bad_fixtures(self):

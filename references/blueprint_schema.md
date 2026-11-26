@@ -154,6 +154,15 @@ the report `line_map` from these references.
 alternation), numbers its bayt, and budgets four bars per hemistich. Put each
 line in its own four bars; the craft checks use that structure.
 
+## Skeleton
+
+`intake_lyrics.py --skeleton blueprint_skeleton.json` writes the mechanical
+part of a Blueprint: `meta`, sections, bars, one `ch` per bar, and one `syl`
+reference per bar. The bars follow the shatr/bayt budget (4/8, or 2/4 for a
+line of eight syllables or fewer). For a repeated section named exactly the
+same (`Chorus`, `Chorus`), the later one uses `same_as` and a new `syl` list.
+Fill only `voc` and `ins`; the compiler adds a missing breath rest.
+
 ## Report line map
 
 The compiler report carries a `line_map` list. It does not change the ABC and
@@ -171,7 +180,8 @@ does not add `w:` lines. Each entry records one lyric line occurrence:
 
 `cadence_pc` is the semitone distance of the last note above the tonic
 (0 = degree 1, 7 = degree 5); `cadence_degree` is the same note spelled as a
-Blueprint degree. The inspector uses it to check that a sadr does
+Blueprint degree. The report also has `auto_breath`, a list of bars where the
+compiler had to shorten notes to fit the required breath rest. The inspector uses it to check that a sadr does
 not end on degree 1 and that an ajuz settles on 5 or 1. `end_rest` and
 `lead_rest` are the rests at the line boundary; at least 0.5 beat is a breath.
 
@@ -191,6 +201,8 @@ not end on degree 1 and that an ajuz settles on 5 or 1. `end_rest` and
 | `bad_tie` | a tie crosses a rest or a different pitch | use the same pitch, or remove the `~` |
 | `bad_meter` | malformed meter | use `N/D` |
 | `bad_section` | missing/duplicate/unknown id or a cycle | fix ids |
+| `bad_verse_bars` | a verse with intake is not whole bayts | make it 8, 16, 24… bars |
+| `breath_space` | no room for the automatic breath rest | shorten a note in that bar |
 
 ## Inspector report
 

@@ -240,6 +240,52 @@ def apply_transpose(events: list[dict], semitones: int) -> None:
         ev["letter"] = LETTERS[(LETTERS.index(ev["letter"]) + steps) % 7]
 
 
+def trailing_rest(events) -> Fraction:
+    total = Fraction(0)
+    for ev in reversed(events):
+        if ev["type"] == "note":
+            break
+        total += ev["dur"]
+    return total
+
+
+def ensure_breath(events: list[dict], required: float) -> Fraction:
+    """Guarantee a trailing breath rest, shortening notes if the bar is full.
+
+    Returns the number of beats that had to be taken from notes (0 when the
+    rest was already long enough).  Raises when even the shortest allowed note
+    cannot make room; the composer then has to shorten that bar deliberately.
+    """
+    need = Fraction(str(required)).limit_denominator(64) - trailing_rest(events)
+    if need <= 0:
+        return Fraction(0)
+    original = need
+    minimum = Fraction(1, 4)
+    for ev in reversed(events):
+        if ev["type"] != "note":
+            continue
+        room = ev["dur"] - minimum
+        if room <= 0:
+            continue
+        take = min(need, room)
+        ev["dur"] -= take
+        need -= take
+        if need <= 0:
+            break
+    if need > 0:
+        raise CompileError(
+            "breath_space",
+            f"cannot fit r:{required} breath without deleting notes; "
+            f"shorten an earlier note in this bar",
+        )
+    # Put the freed time after the last note.
+    if events and events[-1]["type"] == "rest":
+        events[-1]["dur"] += original
+    else:
+        events.append({"type": "rest", "dur": original})
+    return original
+
+
 def expand_voice(text: str, motifs: dict, field: str, key_info: dict,
                  octave_offset: int = 0, stack: tuple[str, ...] = ()) -> list[dict]:
     """Expand a motif reference or a literal voice string into events."""
@@ -493,6 +539,7 @@ def compile_blueprint(bp: dict, intake: dict | None = None, strict: bool = False
     warnings: list[dict] = []
     compiled_sections = []
     all_events = []
+    auto_breath: list[dict] = []
 
     for sec in sections:
         sec_bars = sec["bars"]
@@ -500,7 +547,18 @@ def compile_blueprint(bp: dict, intake: dict | None = None, strict: bool = False
             errors.append({"code": "empty_section", "section": sec["id"],
                            "msg": "section has no bars"})
             continue
+        if line_map and sec["kind"] == "verse" and len(sec_bars) % 8 != 0:
+            raise CompileError(
+                "bad_verse_bars",
+                f"verse has {len(sec_bars)} bars; write whole bayts "
+                f"(4-bar shatr, 8-bar bayt), not a compressed verse",
+                sec["id"],
+            )
         beats = bar_beats(sec["meter"])
+        line_ends = {}
+        for bi0, rb0 in enumerate(sec_bars):
+            for lid0 in line_refs(rb0.get("syl")):
+                line_ends[lid0] = bi0
         out_bars = []
         for bi, rawbar in enumerate(sec_bars):
             try:
@@ -524,6 +582,25 @@ def compile_blueprint(bp: dict, intake: dict | None = None, strict: bool = False
                 for evs in (voc_events, ins_events):
                     if len(evs) == 1 and evs[0]["type"] == "rest" and evs[0]["dur"] == 0:
                         evs[0]["dur"] = beats
+
+                # A breath at the end of every shatr/bayt is mechanical, not a
+                # musical decision.  Add it when the composer left it out.
+                breath = 0.0
+                for lid in line_refs(rawbar.get("syl")):
+                    if line_ends.get(lid) != bi:
+                        continue
+                    role = (line_map.get(lid) or {}).get("role")
+                    if role == "sadr":
+                        breath = max(breath, 1.5)
+                    elif role == "ajuz":
+                        breath = max(breath, 2.0)
+                if breath and any(ev["type"] == "note" for ev in voc_events):
+                    freed = ensure_breath(voc_events, breath)
+                    if freed:
+                        auto_breath.append({
+                            "section": sec["id"], "bar": bi + 1,
+                            "beats": float(freed),
+                        })
 
                 vsum = sum((e["dur"] for e in voc_events), Fraction(0))
                 isum = sum((e["dur"] for e in ins_events), Fraction(0))
@@ -932,6 +1009,7 @@ def compile_blueprint(bp: dict, intake: dict | None = None, strict: bool = False
             "partial_lines": partial_lines,
         },
         "line_map": line_report,
+        "auto_breath": auto_breath,
         "errors": [],
         "warnings": warnings,
     }
