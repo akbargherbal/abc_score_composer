@@ -21,9 +21,9 @@
   reported but not chased.
 - Tests: added skeleton-to-ABC equality and verse-bar-count rejection; all 13
   tests pass with abc2midi.
-- Full-prompt footprint: 104 bars, ~774 output tokens (motifs + voc/ins),
-  0 musical patch rounds; per bar 7.4 tokens versus ~32 in the 0.1.0 run.
-
+- Correction: the earlier full-prompt token estimate counted only `voc/ins`,
+  not the whole agent output. The reproducible metric is `agent_write_B` from
+  `scripts/measure_footprint.py` (1,241 B for the example in 0.2.2).
 ## 0.2.0
 
 - New prosodic layer: `references/vocal_craft.md` defines the line plan

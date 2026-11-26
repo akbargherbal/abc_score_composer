@@ -518,6 +518,9 @@ def print_compact(m: dict, path: str) -> None:
               f"| {midi} | CRAFT OK")
         return
     print(f"FILE {path}")
+    if am.get("available") and (am.get("errors") or am.get("warnings")):
+        print(f"abc2midi {len(am.get('errors', []))} errors, "
+              f"{len(am.get('warnings', []))} warnings")
     if errors:
         print("ERRORS")
         for e in errors[:10]:
