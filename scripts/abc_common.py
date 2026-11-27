@@ -237,6 +237,120 @@ def pct_block(values) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Representable durations (abcjs parity)
+# ---------------------------------------------------------------------------
+# abcjs accepts a duration below a whole note only when it equals
+# base * (2 - 2**-j) for base = 2**-k and j = 0..5 (a plain note, a dotted
+# note, a double-dotted one, ...).  At L:1/16 the units 1,2,3,4,6,7,8,12,14,15
+# pass; 5,9,10,11,13 warn "Duration not representable".  Values of a whole
+# note or longer are not checked.  Always test by fraction of a whole note:
+# the compiler can also pick L:1/32.
+
+_REP_MAX_K = 8
+_REPRESENTABLE: frozenset = frozenset(
+    Fraction(1, 2 ** k) * (2 - Fraction(1, 2 ** j))
+    for k in range(_REP_MAX_K + 1) for j in range(6)
+)
+_REPRESENTABLE_DESC = sorted(_REPRESENTABLE, reverse=True)
+
+
+def representable(frac_of_whole: Fraction) -> bool:
+    """True when abcjs can draw a note/rest of this length (whole-note fraction)."""
+    frac = Fraction(frac_of_whole)
+    if frac >= 1:
+        return True
+    return frac in _REPRESENTABLE
+
+
+def split_duration(frac_of_whole: Fraction) -> list[Fraction]:
+    """Split a length into representable parts, largest part first.
+
+    At L:1/16: 5 -> 4+1, 9 -> 8+1, 10 -> 8+2, 11 -> 8+3, 13 -> 12+1.
+    Values of a whole note or longer pass through unchanged.
+    """
+    frac = Fraction(frac_of_whole)
+    if frac <= 0:
+        raise ValueError("duration must be positive")
+    if representable(frac):
+        return [frac]
+    parts: list[Fraction] = []
+    rest = frac
+    while rest > 0:
+        if representable(rest):
+            parts.append(rest)
+            break
+        part = next((r for r in _REPRESENTABLE_DESC if r <= rest), None)
+        if part is None:
+            raise ValueError(f"duration {frac} cannot be split into representable parts")
+        parts.append(part)
+        rest -= part
+    return parts
+
+
+_DUR_TOKEN_RE = re.compile(
+    r"""
+      (?P<chord>"[^"]*")
+    | (?P<deco>![^!]*!)
+    | (?P<grace>\{[^}]*\})
+    | (?P<inline>\[[A-Za-z]:[^\]]*\])
+    | (?P<rest>[zx])(?P<rnum>\d*)(?P<rslash>/*)(?P<rden>\d*)
+    | (?P<note>(?:\^\^|\^|__|_|=)?[A-Ga-g][,']*)(?P<num>\d*)(?P<slash>/*)(?P<den>\d*)
+    """,
+    re.X,
+)
+
+
+def _header_unit(abc_text: str) -> Fraction:
+    """The unit note length (L:) of an ABC text, as a fraction of a whole note."""
+    unit = None
+    meter = None
+    for line in abc_text.splitlines():
+        s = line.strip()
+        if unit is None and re.match(r"^L:\s*\d+/\d+", s):
+            a, b = re.match(r"^L:\s*(\d+)/(\d+)", s).groups()
+            unit = Fraction(int(a), int(b))
+        elif meter is None and re.match(r"^M:\s*\d+/\d+", s):
+            a, b = re.match(r"^M:\s*(\d+)/(\d+)", s).groups()
+            meter = Fraction(int(a), int(b))
+    if unit is not None:
+        return unit
+    if meter is not None and meter < Fraction(3, 4):
+        return Fraction(1, 16)
+    return Fraction(1, 8)
+
+
+def scan_unrepresentable(abc_text: str) -> list[dict]:
+    """Independently scan final ABC for durations abcjs cannot draw.
+
+    Returns [{"token", "line", "frac"}].  Uses the same `representable`
+    helper the compiler uses, but reads the ABC text itself, so it also
+    catches a regression in the compiler's splitter.
+    """
+    unit = _header_unit(abc_text)
+    found: list[dict] = []
+    for lineno, raw in enumerate(abc_text.splitlines(), 1):
+        s = raw.strip()
+        if not s or s.startswith("%") or re.match(r"^[A-Za-z]:", s):
+            continue
+        for m in _DUR_TOKEN_RE.finditer(s):
+            if m.group("note") is not None:
+                num, slash, den = m.group("num"), m.group("slash"), m.group("den")
+            elif m.group("rest") is not None:
+                num, slash, den = m.group("rnum"), m.group("rslash"), m.group("rden")
+            else:
+                continue
+            n = int(num) if num else 1
+            if slash:
+                d = int(den) if den else 2 ** len(slash)
+            else:
+                d = 1
+            frac = unit * Fraction(n, d)
+            if not representable(frac):
+                found.append({"token": m.group(0), "line": lineno, "frac": str(frac)})
+    return found
+
+
+# ---------------------------------------------------------------------------
 # ABC parser
 # ---------------------------------------------------------------------------
 
@@ -258,6 +372,29 @@ def _parse_duration(num: str | None, den: str | None, unit_beats: Fraction) -> F
     n = int(num) if num else 1
     d = int(den) if den else 1
     return unit_beats * Fraction(n, d)
+
+
+def _merge_split_events(events: list[dict]) -> list[dict]:
+    """Merge tied continuations and adjacent rests inside one bar.
+
+    A note written as `F8-F2` is one sung note, so it must count as one onset
+    (onset count, melisma, long-note share, rhythm patterns).  Without this,
+    splitting an unrepresentable duration would raise onset-based metrics.
+    """
+    out: list[dict] = []
+    for ev in events:
+        prev = out[-1] if out else None
+        if prev is not None:
+            if ev["type"] == "rest" and prev["type"] == "rest":
+                prev["dur"] = prev["dur"] + ev["dur"]
+                continue
+            if (ev["type"] == "note" and prev["type"] == "note"
+                    and prev.get("tie") and prev["midi"] == ev["midi"]):
+                prev["dur"] = prev["dur"] + ev["dur"]
+                prev["tie"] = ev.get("tie", False)
+                continue
+        out.append(dict(ev))
+    return out
 
 
 def _parse_bar(bar: str, key_info: dict, meter: tuple[int, int], unit_beats: Fraction,
@@ -352,6 +489,7 @@ def _parse_bar(bar: str, key_info: dict, meter: tuple[int, int], unit_beats: Fra
 
     if total == 0 and not events:
         return None
+    events = _merge_split_events(events)
     bar_beats = Fraction(meter[0] * 4, meter[1])
     return {
         "section": section,

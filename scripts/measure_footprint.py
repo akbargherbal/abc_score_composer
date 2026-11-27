@@ -28,10 +28,13 @@ import zipfile
 WORD_RE = re.compile(r"\S+", re.UNICODE)
 
 # 0.2.3: also reports seed_block_B, novelty_line_B and package_zip_B.
-# 0.2.2 baseline from docs/footprint_0.2.2.txt.  Mandatory reading may grow by
+# Baseline from docs/footprint_*.txt.  Mandatory reading may grow by
 # at most 150 B in 0.2.3.
-BASELINE_0_2_2_MANDATORY_BYTES = 26484
-MANDATORY_GROWTH_LIMIT = 150
+# 0.2.4: rebased on 0.2.3 (26605 B).  The 0.2.4 fix plan allows SKILL.md +600 B
+# and one compact target table in blueprint_schema.md, which the old
+# 0.2.2 + 150 B cap could not hold.
+BASELINE_0_2_3_MANDATORY_BYTES = 26605
+MANDATORY_GROWTH_LIMIT = 1500
 
 
 def words(text: str) -> int:
@@ -306,8 +309,8 @@ def main() -> int:
     label = args.label or os.path.basename(os.path.abspath(args.root))
     data = measure(args.root, label, args.abc2midi)
     guard_ok = (data["mandatory_bytes"]
-                <= BASELINE_0_2_2_MANDATORY_BYTES + MANDATORY_GROWTH_LIMIT)
-    data["mandatory_baseline_B"] = BASELINE_0_2_2_MANDATORY_BYTES
+                <= BASELINE_0_2_3_MANDATORY_BYTES + MANDATORY_GROWTH_LIMIT)
+    data["mandatory_baseline_B"] = BASELINE_0_2_3_MANDATORY_BYTES
     data["mandatory_growth_limit_B"] = MANDATORY_GROWTH_LIMIT
     data["mandatory_guard_ok"] = guard_ok
     if args.json:
@@ -327,7 +330,7 @@ def main() -> int:
           f"{data['package_zip_B']:8d}")
     if not guard_ok:
         print(f"GUARD FAIL: mandatory reading {data['mandatory_bytes']} B exceeds "
-              f"the 0.2.2 baseline {BASELINE_0_2_2_MANDATORY_BYTES} B by more "
+              f"the 0.2.3 baseline {BASELINE_0_2_3_MANDATORY_BYTES} B by more "
               f"than {MANDATORY_GROWTH_LIMIT} B", file=sys.stderr)
         return 1
     return 0

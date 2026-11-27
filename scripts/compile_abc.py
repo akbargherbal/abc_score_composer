@@ -26,6 +26,7 @@ from fractions import Fraction
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from abc_common import (  # noqa: E402
     LETTERS, degree_to_midi, dump_json, load_json, parse_key, spell_midi,
+    split_duration,
 )
 
 CHORD_QUALITIES = [
@@ -838,6 +839,25 @@ def compile_blueprint(bp: dict, intake: dict | None = None, strict: bool = False
     def voice_key(voice: str) -> str:
         return "voc" if voice == "Vocal" else "ins"
 
+    def unit_parts(dur, units_per_beat, what):
+        """Integer grid units of one event, split into representable parts.
+
+        abcjs cannot draw 5, 9, 10, 11 or 13 units at L:1/16, so those are
+        emitted as several parts (tied notes, consecutive rests).  The
+        in-repo parser merges them back, so metrics do not change.
+        """
+        u = dur * units_per_beat
+        if u.denominator != 1:
+            raise CompileError("grid", f"{what} {dur} does not fit grid")
+        whole_per_unit = Fraction(1, 4) / units_per_beat
+        parts = []
+        for part in split_duration(u * whole_per_unit):
+            pu = part / whole_per_unit
+            if pu.denominator != 1:
+                raise CompileError("grid", f"{what} {dur} cannot be split on the grid")
+            parts.append(int(pu))
+        return parts
+
     def render_events(events, ch, voice, beats, units_per_beat, key_info):
         out = []
         if voice == "Vocal" and ch:
@@ -845,27 +865,21 @@ def compile_blueprint(bp: dict, intake: dict | None = None, strict: bool = False
         had_event = False
         for ev in events:
             if ev["type"] == "rest":
-                u = ev["dur"] * units_per_beat
-                if u.denominator != 1:
-                    raise CompileError("grid", f"rest {ev['dur']} does not fit grid")
-                out.append("z" + ("" if u == 1 else str(u.numerator)))
+                for pu in unit_parts(ev["dur"], units_per_beat, "rest"):
+                    out.append("z" + ("" if pu == 1 else str(pu)))
                 had_event = True
             else:
-                u = ev["dur"] * units_per_beat
-                if u.denominator != 1:
-                    raise CompileError("grid", f"note {ev['dur']} does not fit grid")
-                txt = spell_midi(ev["midi"], ev["letter"], key_info)
-                if u != 1:
-                    txt += str(u.numerator)
-                if ev.get("tie"):
-                    txt += "-"
-                out.append(txt)
+                parts = unit_parts(ev["dur"], units_per_beat, "note")
+                pitch = spell_midi(ev["midi"], ev["letter"], key_info)
+                for i, pu in enumerate(parts):
+                    txt = pitch + ("" if pu == 1 else str(pu))
+                    if i < len(parts) - 1 or ev.get("tie"):
+                        txt += "-"
+                    out.append(txt)
                 had_event = True
         if not had_event:
-            u = beats * units_per_beat
-            if u.denominator != 1:
-                raise CompileError("grid", f"rest {beats} does not fit grid")
-            out.append("z" + ("" if u == 1 else str(u.numerator)))
+            for pu in unit_parts(beats, units_per_beat, "rest"):
+                out.append("z" + ("" if pu == 1 else str(pu)))
         return "".join(out)
 
     def is_silent(bar, voice):

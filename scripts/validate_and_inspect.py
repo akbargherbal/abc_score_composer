@@ -26,7 +26,7 @@ from statistics import median
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from abc_common import (  # noqa: E402
     bar_has_notes, bar_rest_beats, bar_total_beats, dump_json, load_json,
-    midi_to_name, parse_abc,
+    midi_to_name, parse_abc, scan_unrepresentable,
 )
 from craft_checks import analyse_craft, load_thresholds  # noqa: E402
 
@@ -136,9 +136,13 @@ def parse_w_melisma(path: str) -> dict | None:
             continue
         # A music line.  Strip chords and count note letters, not rests.
         music = re.sub(r'"[^"]*"', "", s)
+        # A tied continuation (`F8-F2`) is the same sung note, not a new onset.
         n = 0
-        for m in re.finditer(r"(?:\^\^|\^|__|_)?[A-Ga-g][,']*", music):
-            n += 1
+        tied = False
+        for m in re.finditer(r"(?:\^\^|\^|__|_|=)?[A-Ga-g][,']*\d*(?:/\d+)?(-)?", music):
+            if not tied:
+                n += 1
+            tied = bool(m.group(1))
         pending_notes += n
     if not saw or not syl:
         return None
@@ -485,6 +489,21 @@ def build_report(abc_path: str, validation: str | None, report_path: str | None,
     if maqam_fit is not None and maqam_fit < 0.8:
         diags.append(f"maqam fit {maqam_fit:.0%} for {maqam}; expected pitch classes "
                      f"{maqam_expected} from the tonic (0-11)")
+
+    # Representability guard: durations abcjs cannot draw.  The compiler splits
+    # them, so this should never fire; it protects against regressions and
+    # against hand-edited ABC.
+    try:
+        with open(abc_path, encoding="utf-8", errors="replace") as fh:
+            unrep = scan_unrepresentable(fh.read())
+    except OSError:
+        unrep = []
+    metrics["unrepresentable"] = unrep
+    seen_tokens: set = set()
+    for item in unrep:
+        if item["token"] not in seen_tokens:
+            seen_tokens.add(item["token"])
+            errors.append(f"DURATION unrepresentable: {item['token']}")
 
     # abc2midi.
     binary = find_abc2midi(abc2midi_path)

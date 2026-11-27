@@ -248,7 +248,7 @@ class AssetTests(unittest.TestCase):
         self.assertGreater(data["package_zip_B"], 600 * 1024)
         self.assertLess(data["package_zip_B"], 2 * 1024 * 1024)
         self.assertLessEqual(data["mandatory_bytes"],
-                             measure_footprint.BASELINE_0_2_2_MANDATORY_BYTES
+                             measure_footprint.BASELINE_0_2_3_MANDATORY_BYTES
                              + measure_footprint.MANDATORY_GROWTH_LIMIT)
 
 

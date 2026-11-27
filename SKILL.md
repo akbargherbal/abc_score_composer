@@ -82,7 +82,7 @@ corpus card.
 - `CRAFT` checks line length, breath, cadence, long-note share, and register
   range. Advisory unless `meta.targets.craft` is true and you pass `--strict`.
 - `NOVELTY` is advisory corpus similarity; it appears only when a melody is close to the corpus and never fails a build.
-- Any `abc2midi` `Error`/`Warning` is a hard failure.
+- Any `abc2midi` `Error`/`Warning`, or `DURATION unrepresentable`, is a hard failure.
 
 ## 4. Patch the Blueprint, not the ABC
 
@@ -96,7 +96,7 @@ appears).
 
 Deliver `song.abc` when:
 
-- `abc2midi` reports **0 errors and 0 warnings**;
+- `abc2midi` **and** the representability guard report nothing;
 - every bar sums, both voices align, and every pitch is in range;
 - `syl` covers the vocal bars and no intake line is unused;
 - CRAFT is advisory: mention any flag, do not chase it;
