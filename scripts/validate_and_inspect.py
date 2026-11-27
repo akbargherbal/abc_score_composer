@@ -145,9 +145,36 @@ def parse_w_melisma(path: str) -> dict | None:
     return {"notes": notes, "syllables": syl, "rate": notes / syl, "source": "w:"}
 
 
+def novelty_report(abc_path: str, bank_path: str | None = None) -> dict | None:
+    """Advisory corpus-novelty line, or None.
+
+    The novelty check is optional and must never break inspection: a missing
+    asset, a corrupt bank, an unknown maqam, or any exception means skip with
+    no error and no extra output.  The bank header carries the threshold; no
+    threshold is hardcoded here.
+    """
+    try:
+        import novelty_check
+        if bank_path is None:
+            bank_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "..", "assets",
+                "corpus_fingerprints.bin")
+        line = novelty_check.check(abc_path, bank_path)
+        if "status=close" in line:
+            status = "close"
+        elif "status=ok" in line:
+            status = "ok"
+        else:
+            status = None
+        return {"line": line, "status": status}
+    except Exception:
+        return None
+
+
 def build_report(abc_path: str, validation: str | None, report_path: str | None,
                  profile_path: str | None, abc2midi_path: str | None,
-                 strict: bool = False, craft_thresholds_path: str | None = None) -> dict:
+                 strict: bool = False, craft_thresholds_path: str | None = None,
+                 novelty_bank: str | None = None) -> dict:
     parsed = parse_abc(abc_path)
     hdr = parsed["header"]
     v_bars = parsed["voices"].get("Vocal", [])
@@ -487,6 +514,8 @@ def build_report(abc_path: str, validation: str | None, report_path: str | None,
     metrics["flags"] = flags
     metrics["diagnostics"] = diags
     metrics["ok"] = not hard_fail
+    # Advisory only: never changes ok/hard_fail and never raises.
+    metrics["novelty"] = novelty_report(abc_path, novelty_bank)
     return metrics
 
 
@@ -511,11 +540,16 @@ def print_compact(m: dict, path: str) -> None:
     warnings = m.get("warnings") or []
     target_flags = [f for f in (m.get("flags") or []) if "corpus" not in f]
     am = m.get("abc2midi") or {}
+    nov = m.get("novelty") or {}
+    # Compact cards stay quiet unless the score is close to the corpus.
+    nov_line = nov.get("line") if nov.get("status") == "close" else None
     if m.get("ok") and not cflags and not target_flags:
         midi = ("abc2midi OK" if am.get("available") and not errors and not warnings
                 else f"abc2midi {len(errors)} errors, {len(warnings)} warnings")
         print(f"OK {m['bars']} bars {m['meter']} {m['key']} {m['tempo']} BPM "
               f"| {midi} | CRAFT OK")
+        if nov_line:
+            print(nov_line)
         return
     print(f"FILE {path}")
     if am.get("available") and (am.get("errors") or am.get("warnings")):
@@ -533,6 +567,8 @@ def print_compact(m: dict, path: str) -> None:
         print("CRAFT FLAGS " + "; ".join(cflags[:8]))
     if target_flags:
         print("TARGET FLAGS " + "; ".join(target_flags[:8]))
+    if nov_line:
+        print(nov_line)
 
 
 def print_verbose(m: dict, path: str) -> None:
@@ -602,6 +638,9 @@ def print_verbose(m: dict, path: str) -> None:
         print("WARNINGS")
         for w in m["warnings"][:8]:
             print("  " + w)
+    nov = m.get("novelty") or {}
+    if nov.get("line"):
+        print(nov["line"])
 
 
 def main() -> int:
@@ -613,6 +652,8 @@ def main() -> int:
     ap.add_argument("--abc2midi", default=None)
     ap.add_argument("--craft-thresholds", default=None,
                     help="craft_thresholds.json (default: ../assets/craft_thresholds.json)")
+    ap.add_argument("--novelty-bank", default=None,
+                    help="corpus_fingerprints.bin (default: ../assets/corpus_fingerprints.bin)")
     ap.add_argument("--strict", action="store_true",
                     help="exit 1 when a declared target fails")
     ap.add_argument("--verbose", action="store_true",
@@ -626,7 +667,8 @@ def main() -> int:
     try:
         r = build_report(args.abc, args.validation, args.report, profile,
                          args.abc2midi, strict=args.strict,
-                         craft_thresholds_path=args.craft_thresholds)
+                         craft_thresholds_path=args.craft_thresholds,
+                         novelty_bank=args.novelty_bank)
     except Exception as exc:
         print(json.dumps({"ok": False, "errors": [f"parse: {exc}"]}))
         return 2
