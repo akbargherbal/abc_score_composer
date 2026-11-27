@@ -1,6 +1,6 @@
 ---
 name: abc-score-writer
-version: "0.2.3"
+version: "0.2.4"
 description: >-
   Compose a complete SheetSage2-style two-voice ABC score from Arabic lyrics
   and a style prompt (Arabic maqam, tarab, symphonic metal, etc.). The model

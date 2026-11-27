@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.2.4
+
+### Fixed
+
+- `[End]`, `[Fin]`, and other lyric-less unknown sections become `outro` (last
+  section) or `interlude`, not `verse`; the skeleton ends on the tonic.
+- Durations abcjs cannot draw (5, 9, 10, 11, 13 units at `L:1/16`) are emitted
+  as tied notes or consecutive rests. The parser merges them back, so onsets,
+  melisma, long-note share, and rhythm patterns are unchanged. The inspector
+  adds a `DURATION unrepresentable: <token>` guard.
+
+### Changed
+
+- `DEFAULT_TARGETS` is the single source of truth. `melisma` is no longer a
+  default target; an edited or added target prints `TARGET edited: ...` and
+  appears as `targets_edited` in `--json`. The schema now records cap/goal and
+  provenance for each target.
+- The skeleton's `ch`, `syl`, and `meta.targets` are defaults. A fill row may
+  be `[voc, ins]`, `[voc, ins, ch, syl]`, or a dict, so `ch`/`syl` can be
+  overridden per bar. Targets must not be edited.
+- The patch loop is bounded by flags: at most two rounds that touch only
+  flagged lines or bars. This limit is provisional.
+
+### Added
+
+- Variety instrumentation: `rhythm_variety` and `contour_overlap` produce
+  advisory flags; `cadence_variety`, `ins_variety`, and `chord_variety` are
+  `--json` information only. Thresholds are provisional and uncalibrated; they
+  never gate a build.
+- Authoring-cost instrumentation: `fill_bytes`, `abc_bytes`, and
+  `fill_to_abc_ratio` in the report, a `--verbose` cost line, a footprint row,
+  and a note that NOVELTY sees the Vocal voice only.
+
+### Monitored, not changed
+
+- The 4/3/3/4 syllable split, `chord_loop()` content, CRAFT thresholds,
+  `vocal_span`/`chorus_lift`/`call_response`/`max_phrase_seconds`/`maqam_fit`
+  values, corpus medians, tempo 93, drums/choir/percussion, `%%MIDI`,
+  `--no-chords`, and quarter tones.
+
 ## 0.2.3
 
 ### Added (all optional; no mandatory reading added)

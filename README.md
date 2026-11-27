@@ -35,9 +35,9 @@ python3 scripts/validate_and_inspect.py song.abc \
   --abc2midi /path/to/abc2midi
 ```
 
-Write only `voc`/`ins` rows in `fill.json`; `ch` and `syl` stay in the
-skeleton. The inspector prints one line on success; add `--verbose` for the
-full card.
+Write `voc`/`ins` rows in `fill.json`; `ch` and `syl` default to the skeleton
+but may be overridden per bar. The inspector prints one line on success; add
+`--verbose` for the full card.
 
 The delivered `song.abc` mirrors the corpus: `V: Vocal` + `V: Ins`, no `w:`
 lyrics, 4-bar voice blocks, chord symbols on the vocal, `Z` for silent bars.
