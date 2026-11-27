@@ -1,0 +1,1948 @@
+{
+ "schema": "phrase_bank/2",
+ "generated_from": {
+  "corpus": "deduped 599-file set",
+  "roles": "heuristic from cadence + length",
+  "degree_convention": "Repo B abc_common.degree_to_midi; semitone 6 = b5",
+  "mode_hint": "two-stage classifier, export_phrases.mode_hint; degrees are tonic-relative, not tied to source_key",
+  "selection": {
+   "min_per_mode": 4,
+   "modes": [
+    "kurd-like",
+    "hijaz-like",
+    "bayati-like",
+    "rast-like",
+    "nahawand-like"
+   ],
+   "max_phrase_bytes": 130,
+   "per_class": 24
+  }
+ },
+ "grammar": {
+  "note": "degree:beats",
+  "rest": "r:<beats>",
+  "tie": "trailing ~",
+  "degrees": [
+   "1",
+   "b2",
+   "2",
+   "b3",
+   "3",
+   "4",
+   "b5",
+   "5",
+   "b6",
+   "6",
+   "b7",
+   "7"
+  ],
+  "fields_added_in_schema_2": [
+   "phrase_bytes",
+   "fits_seed_budget",
+   "counts.mode_shortfall",
+   "counts.seed_budget",
+   "counts.min_per_mode"
+  ]
+ },
+ "counts": {
+  "by_cadence_class": {
+   "ajuz": 24,
+   "sadr": 24
+  },
+  "by_register": {
+   "mid": 16,
+   "high": 29,
+   "low": 3
+  },
+  "by_mode_hint": {
+   "kurd-like": 8,
+   "hijaz-like": 8,
+   "minor-like": 6,
+   "nahawand-like": 15,
+   "major-like": 2,
+   "rast-like": 8,
+   "bayati-like": 1
+  },
+  "by_beats": {
+   "8": 45,
+   "16": 3
+  },
+  "candidates": 21396,
+  "candidates_after_byte_limit": 6897,
+  "skipped_songs": 3,
+  "min_per_mode": 4,
+  "mode_shortfall": {
+   "bayati-like": {
+    "wanted": 8,
+    "got": 1,
+    "by_cadence_class": {
+     "sadr": {
+      "wanted": 4,
+      "got": 1
+     },
+     "ajuz": {
+      "wanted": 4,
+      "got": 0
+     }
+    }
+   }
+  },
+  "seed_budget": {
+   "candidates": {
+    "limit_bytes": 130,
+    "fit": 6897,
+    "over": 14499,
+    "by_cadence_class": {
+     "ajuz": {
+      "fit": 4172,
+      "over": 6306
+     },
+     "sadr": {
+      "fit": 2725,
+      "over": 8193
+     }
+    },
+    "by_mode": {
+     "nahawand-like": {
+      "fit": 4913,
+      "over": 11004
+     },
+     "minor-like": {
+      "fit": 1031,
+      "over": 1088
+     },
+     "kurd-like": {
+      "fit": 522,
+      "over": 1457
+     },
+     "rast-like": {
+      "fit": 112,
+      "over": 193
+     },
+     "major-like": {
+      "fit": 301,
+      "over": 729
+     },
+     "hijaz-like": {
+      "fit": 17,
+      "over": 27
+     },
+     "saba-like": {
+      "fit": 0,
+      "over": 1
+     },
+     "bayati-like": {
+      "fit": 1,
+      "over": 0
+     }
+    },
+    "by_beats": {
+     "16": {
+      "fit": 226,
+      "over": 9551
+     },
+     "8": {
+      "fit": 6671,
+      "over": 4948
+     }
+    }
+   },
+   "bank": {
+    "limit_bytes": 130,
+    "fit": 48,
+    "over": 0,
+    "by_cadence_class": {
+     "ajuz": {
+      "fit": 24,
+      "over": 0
+     },
+     "sadr": {
+      "fit": 24,
+      "over": 0
+     }
+    },
+    "by_mode": {
+     "kurd-like": {
+      "fit": 8,
+      "over": 0
+     },
+     "hijaz-like": {
+      "fit": 8,
+      "over": 0
+     },
+     "minor-like": {
+      "fit": 6,
+      "over": 0
+     },
+     "nahawand-like": {
+      "fit": 15,
+      "over": 0
+     },
+     "major-like": {
+      "fit": 2,
+      "over": 0
+     },
+     "rast-like": {
+      "fit": 8,
+      "over": 0
+     },
+     "bayati-like": {
+      "fit": 1,
+      "over": 0
+     }
+    },
+    "by_beats": {
+     "8": {
+      "fit": 45,
+      "over": 0
+     },
+     "16": {
+      "fit": 3,
+      "over": 0
+     }
+    }
+   }
+  }
+ },
+ "phrases": [
+  {
+   "beats": 8,
+   "phrase": "1:0.5 1:1 b2:0.5 b3:0.5 b3:0.5 4:0.5 4:0.5 5:4",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "kurd-like",
+   "source_midi": [
+    67,
+    67,
+    68,
+    70,
+    70,
+    72,
+    72,
+    74
+   ],
+   "source_bars": [
+    63,
+    64
+   ],
+   "register": "mid",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.429,
+   "span": 7,
+   "source_id": "suno-0031.abc",
+   "source_key": "Gm",
+   "cluster": "C012",
+   "phrase_bytes": 46,
+   "fits_seed_budget": true,
+   "id": "P001"
+  },
+  {
+   "beats": 8,
+   "phrase": "1:0.5 1:0.5 1:0.5 1:0.5 1:0.5 b7-:0.5 b6-:0.5 r:0.25 b2:0.25 b2:0.5 b2:0.5 4:0.5 b2:0.5 3:0.5 3:0.5 b2:0.5 1:0.5",
+   "end_degree": "1",
+   "cadence_class": "ajuz",
+   "role_hint": "ajuz (assumes section end)",
+   "mode_hint": "hijaz-like",
+   "source_midi": [
+    70,
+    70,
+    70,
+    70,
+    70,
+    68,
+    66,
+    71,
+    71,
+    71,
+    75,
+    71,
+    74,
+    74,
+    71,
+    70
+   ],
+   "source_bars": [
+    124,
+    125
+   ],
+   "register": "mid",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.467,
+   "span": 9,
+   "source_id": "suno-0059.abc",
+   "source_key": "Bbm",
+   "cluster": "S:suno-0059.abc",
+   "phrase_bytes": 112,
+   "fits_seed_budget": true,
+   "id": "P002"
+  },
+  {
+   "beats": 8,
+   "phrase": "5:1 b6:0.5 b7:0.5 1+:0.25 b7:0.25 b6:0.5 b7:0.5 1+:0.5 r:0.5 3+:0.5 3+:1 b2+:1 1+:1",
+   "end_degree": "1",
+   "cadence_class": "ajuz",
+   "role_hint": "ajuz (assumes section end)",
+   "mode_hint": "hijaz-like",
+   "source_midi": [
+    67,
+    68,
+    70,
+    72,
+    70,
+    68,
+    70,
+    72,
+    76,
+    76,
+    73,
+    72
+   ],
+   "source_bars": [
+    103,
+    104
+   ],
+   "register": "high",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.091,
+   "span": 9,
+   "source_id": "suno-0070.abc",
+   "source_key": "C",
+   "cluster": "S:suno-0070.abc",
+   "phrase_bytes": 83,
+   "fits_seed_budget": true,
+   "id": "P003"
+  },
+  {
+   "beats": 8,
+   "phrase": "4-:1 5-:1 b6-:1 4-:1 5-:1 b6-:1 b7-:1 1:0.5 1:0.5",
+   "end_degree": "1",
+   "cadence_class": "ajuz",
+   "role_hint": "ajuz (assumes section end)",
+   "mode_hint": "minor-like",
+   "source_midi": [
+    60,
+    62,
+    63,
+    60,
+    62,
+    63,
+    65,
+    67,
+    67
+   ],
+   "source_bars": [
+    89,
+    90
+   ],
+   "register": "low",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.125,
+   "span": 7,
+   "source_id": "suno-0073.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0073.abc",
+   "phrase_bytes": 49,
+   "fits_seed_budget": true,
+   "id": "P004"
+  },
+  {
+   "beats": 8,
+   "phrase": "5:2 1:1 2:0.5 2:0.5 b3:1 b5:0.5 5:2 r:0.5",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    74,
+    67,
+    69,
+    69,
+    70,
+    73,
+    74
+   ],
+   "source_bars": [
+    79,
+    80
+   ],
+   "register": "mid",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.167,
+   "span": 7,
+   "source_id": "suno-0076.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0076.abc",
+   "phrase_bytes": 41,
+   "fits_seed_budget": true,
+   "id": "P005"
+  },
+  {
+   "beats": 8,
+   "phrase": "b3:0.25 b3:0.25 4:0.25 b3:0.25 2:0.25 1:0.5 b3:0.25 4:0.25 b3:0.25 r:0.25 4:0.25 5:0.25 4:0.25 r:0.25 5:4 r:0.25",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    68,
+    68,
+    70,
+    68,
+    67,
+    65,
+    68,
+    70,
+    68,
+    70,
+    72,
+    70,
+    72
+   ],
+   "source_bars": [
+    100,
+    101
+   ],
+   "register": "mid",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.083,
+   "span": 7,
+   "source_id": "suno-0096.abc",
+   "source_key": "Fm",
+   "cluster": "S:suno-0096.abc",
+   "phrase_bytes": 112,
+   "fits_seed_budget": true,
+   "id": "P006"
+  },
+  {
+   "beats": 8,
+   "phrase": "2:1 b3:1 4:1 5:1 4:1 b3:1 2:1 1:1",
+   "end_degree": "1",
+   "cadence_class": "ajuz",
+   "role_hint": "ajuz (assumes section end)",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    66,
+    67,
+    69,
+    71,
+    69,
+    67,
+    66,
+    64
+   ],
+   "source_bars": [
+    13,
+    14
+   ],
+   "register": "mid",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.0,
+   "span": 7,
+   "source_id": "suno-0125.abc",
+   "source_key": "Em",
+   "cluster": "C020",
+   "phrase_bytes": 33,
+   "fits_seed_budget": true,
+   "id": "P007"
+  },
+  {
+   "beats": 8,
+   "phrase": "2:0.5 b3:0.25 2:0.25 b3:0.25 4:0.25 2:0.25 b3:0.25 1:0.5 r:0.5 4:1 2:0.5 b3:0.25 2:0.25 b3:0.5 1:0.5 1:0.5 r:0.5 5:1",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    71,
+    72,
+    71,
+    72,
+    74,
+    71,
+    72,
+    69,
+    74,
+    71,
+    72,
+    71,
+    72,
+    69,
+    69,
+    76
+   ],
+   "source_bars": [
+    70,
+    71
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.067,
+   "span": 7,
+   "source_id": "suno-0127.abc",
+   "source_key": "Am",
+   "cluster": "S:suno-0127.abc",
+   "phrase_bytes": 116,
+   "fits_seed_budget": true,
+   "id": "P008"
+  },
+  {
+   "beats": 8,
+   "phrase": "2:1 2:0.5 b3:1 4:1 b6:0.5 5:1.5 5:1 b6:0.25 5:0.25 5:0.5 r:0.5",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    67,
+    67,
+    68,
+    70,
+    73,
+    72,
+    72,
+    73,
+    72,
+    72
+   ],
+   "source_bars": [
+    44,
+    46
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.333,
+   "span": 6,
+   "source_id": "suno-0130.abc",
+   "source_key": "Fm",
+   "cluster": "S:suno-0130.abc",
+   "phrase_bytes": 62,
+   "fits_seed_budget": true,
+   "id": "P009"
+  },
+  {
+   "beats": 8,
+   "phrase": "6:0.5 6:1 7:1 2+:3 1+:1 5:1 r:0.5",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "major-like",
+   "source_midi": [
+    76,
+    76,
+    78,
+    81,
+    79,
+    74
+   ],
+   "source_bars": [
+    42,
+    44
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.2,
+   "span": 7,
+   "source_id": "suno-0183.abc",
+   "source_key": "G",
+   "cluster": "S:suno-0183.abc",
+   "phrase_bytes": 33,
+   "fits_seed_budget": true,
+   "id": "P010"
+  },
+  {
+   "beats": 8,
+   "phrase": "b2+:0.5 b2+:0.5 b2+:0.5 4+:0.25 b3+:0.25 b3+:1 1+:0.5 b7:0.25 b7:0.25 b3+:1.5 4+:0.25 b3+:0.25 b2+:1 r:0.5 b7:0.25 1+:0.25",
+   "end_degree": "1",
+   "cadence_class": "ajuz",
+   "role_hint": "ajuz (assumes section end)",
+   "mode_hint": "kurd-like",
+   "source_midi": [
+    75,
+    75,
+    75,
+    79,
+    77,
+    77,
+    74,
+    72,
+    72,
+    77,
+    79,
+    77,
+    75,
+    72,
+    74
+   ],
+   "source_bars": [
+    42,
+    43
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.286,
+   "span": 7,
+   "source_id": "suno-0350.abc",
+   "source_key": "Dm",
+   "cluster": "S:suno-0350.abc",
+   "phrase_bytes": 122,
+   "fits_seed_budget": true,
+   "id": "P011"
+  },
+  {
+   "beats": 8,
+   "phrase": "2+:2 1+:0.25 2+:0.25 1+:0.5 b7:0.5 2+:0.75 1+:0.75 b7:0.5 1+:0.75 b7:0.75 b6:0.5 5:0.25 r:0.25",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    81,
+    79,
+    81,
+    79,
+    77,
+    81,
+    79,
+    77,
+    79,
+    77,
+    75,
+    74
+   ],
+   "source_bars": [
+    96,
+    98
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.0,
+   "span": 7,
+   "source_id": "suno-0362.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0362.abc",
+   "phrase_bytes": 94,
+   "fits_seed_budget": true,
+   "id": "P012"
+  },
+  {
+   "beats": 8,
+   "phrase": "2:1 r:0.5 5-:0.25 2:0.75 1:0.5 7-:1 1:1.5 r:0.25 b7-:0.25 6-:0.5 b7-:0.25 6-:0.25 5-:0.5 r:0.5",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "rast-like",
+   "source_midi": [
+    72,
+    65,
+    72,
+    70,
+    69,
+    70,
+    68,
+    67,
+    68,
+    67,
+    65
+   ],
+   "source_bars": [
+    74,
+    77
+   ],
+   "register": "mid",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.0,
+   "span": 7,
+   "source_id": "suno-0364.abc",
+   "source_key": "Bbm",
+   "cluster": "S:suno-0364.abc",
+   "phrase_bytes": 94,
+   "fits_seed_budget": true,
+   "id": "P013"
+  },
+  {
+   "beats": 8,
+   "phrase": "2:0.5 b3:0.5 1:0.5 2:0.5 b7-:0.5 1:0.5 6-:0.5 b7-:0.5 5-:0.75 6-:0.25 b7-:1 6-:0.5 5-:1 r:0.5",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "rast-like",
+   "source_midi": [
+    71,
+    72,
+    69,
+    71,
+    67,
+    69,
+    66,
+    67,
+    64,
+    66,
+    67,
+    66,
+    64
+   ],
+   "source_bars": [
+    20,
+    23
+   ],
+   "register": "mid",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.0,
+   "span": 8,
+   "source_id": "suno-0376.abc",
+   "source_key": "Am",
+   "cluster": "S:suno-0376.abc",
+   "phrase_bytes": 93,
+   "fits_seed_budget": true,
+   "id": "P014"
+  },
+  {
+   "beats": 8,
+   "phrase": "b7:1 6:0.5 b7:0.5 6:0.5 1+:0.5 2+:0.5 1+:2 b7:1 b6:1 5:0.5",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "rast-like",
+   "source_midi": [
+    80,
+    79,
+    80,
+    79,
+    82,
+    84,
+    82,
+    80,
+    78,
+    77
+   ],
+   "source_bars": [
+    135,
+    137
+   ],
+   "register": "high",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.0,
+   "span": 7,
+   "source_id": "suno-0413.abc",
+   "source_key": "Bbm",
+   "cluster": "S:suno-0413.abc",
+   "phrase_bytes": 58,
+   "fits_seed_budget": true,
+   "id": "P015"
+  },
+  {
+   "beats": 8,
+   "phrase": "5+:0.5 4+:1.5 r:0.25 b3+:0.25 b2+:1 b2+:0.5 b2+:0.25 4+:0.5 b2+:0.5 4+:0.5 b3+:0.25 b2+:0.5 1+:0.5 r:1",
+   "end_degree": "1",
+   "cadence_class": "ajuz",
+   "role_hint": "ajuz (assumes section end)",
+   "mode_hint": "kurd-like",
+   "source_midi": [
+    82,
+    80,
+    78,
+    76,
+    76,
+    76,
+    80,
+    76,
+    80,
+    78,
+    76,
+    75
+   ],
+   "source_bars": [
+    33,
+    37
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.182,
+   "span": 7,
+   "source_id": "suno-0460.abc",
+   "source_key": "D#m",
+   "cluster": "S:suno-0460.abc",
+   "phrase_bytes": 102,
+   "fits_seed_budget": true,
+   "id": "P016"
+  },
+  {
+   "beats": 8,
+   "phrase": "1+:0.5 2+:0.25 1+:0.75 b7:0.5 1+:0.5 b7:0.5 1+:0.5 b7:0.5 1+:0.5 b7:0.5 b7:0.5 6:0.5 5:0.5 b7:0.5 6:0.5 5:0.5",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "rast-like",
+   "source_midi": [
+    79,
+    81,
+    79,
+    77,
+    79,
+    77,
+    79,
+    77,
+    79,
+    77,
+    77,
+    76,
+    74,
+    77,
+    76,
+    74
+   ],
+   "source_bars": [
+    137,
+    140
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.067,
+   "span": 7,
+   "source_id": "suno-0499.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0499.abc",
+   "phrase_bytes": 109,
+   "fits_seed_budget": true,
+   "id": "P017"
+  },
+  {
+   "beats": 8,
+   "phrase": "2+:0.25 1+:0.75 2+:0.25 1+:0.75 1+:0.25 1+:0.75 2+:0.25 3+:0.75 5+:0.25 4+:0.75 3+:0.25 2+:0.75 1+:0.25 1+:0.75 1+:0.25 1+:0.75",
+   "end_degree": "1",
+   "cadence_class": "ajuz",
+   "role_hint": "ajuz (assumes section end)",
+   "mode_hint": "major-like",
+   "source_midi": [
+    75,
+    73,
+    75,
+    73,
+    73,
+    73,
+    75,
+    77,
+    80,
+    78,
+    77,
+    75,
+    73,
+    73,
+    73,
+    73
+   ],
+   "source_bars": [
+    60,
+    63
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.333,
+   "span": 7,
+   "source_id": "suno-0506.abc",
+   "source_key": "Db",
+   "cluster": "S:suno-0506.abc",
+   "phrase_bytes": 127,
+   "fits_seed_budget": true,
+   "id": "P018"
+  },
+  {
+   "beats": 8,
+   "phrase": "5:0.5 b3:1 b3:1 b3:0.5 b2:1 4:1 b3:0.5 b2:0.5 b2:1 1:1",
+   "end_degree": "1",
+   "cadence_class": "ajuz",
+   "role_hint": "ajuz (assumes section end)",
+   "mode_hint": "kurd-like",
+   "source_midi": [
+    67,
+    63,
+    63,
+    63,
+    61,
+    65,
+    63,
+    61,
+    61,
+    60
+   ],
+   "source_bars": [
+    24,
+    25
+   ],
+   "register": "low",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.333,
+   "span": 7,
+   "source_id": "suno-0522.abc",
+   "source_key": "Cm",
+   "cluster": "S:suno-0522.abc",
+   "phrase_bytes": 54,
+   "fits_seed_budget": true,
+   "id": "P019"
+  },
+  {
+   "beats": 8,
+   "phrase": "4+:1 r:0.5 2+:0.5 b3+:1 b6+:1 5+:4",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "minor-like",
+   "source_midi": [
+    77,
+    74,
+    75,
+    80,
+    79
+   ],
+   "source_bars": [
+    148,
+    149
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.0,
+   "span": 6,
+   "source_id": "suno-0569.abc",
+   "source_key": "Cm",
+   "cluster": "S:suno-0569.abc",
+   "phrase_bytes": 34,
+   "fits_seed_budget": true,
+   "id": "P020"
+  },
+  {
+   "beats": 8,
+   "phrase": "b3:0.5 2:0.5 1:0.25 r:0.25 1:0.75 1:0.75 1:1.5 1:1 b7:0.75 b6:0.75 5:1",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    70,
+    69,
+    67,
+    67,
+    67,
+    67,
+    67,
+    77,
+    75,
+    74
+   ],
+   "source_bars": [
+    93,
+    96
+   ],
+   "register": "mid",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.444,
+   "span": 10,
+   "source_id": "suno-0583.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0583.abc",
+   "phrase_bytes": 70,
+   "fits_seed_budget": true,
+   "id": "P021"
+  },
+  {
+   "beats": 8,
+   "phrase": "5:0.5 b6:0.5 b7:0.5 1+:0.75 b3+:0.75 2+:0.25 2+:0.75 r:0.25 5:0.25 b6:0.5 b7:0.5 1+:0.75 b3+:0.75 2+:0.25 1+:0.75",
+   "end_degree": "1",
+   "cadence_class": "ajuz",
+   "role_hint": "ajuz (assumes section end)",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    69,
+    70,
+    72,
+    74,
+    77,
+    76,
+    76,
+    69,
+    70,
+    72,
+    74,
+    77,
+    76,
+    74
+   ],
+   "source_bars": [
+    100,
+    101
+   ],
+   "register": "high",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.077,
+   "span": 8,
+   "source_id": "suno-0610.abc",
+   "source_key": "Dm",
+   "cluster": "S:suno-0610.abc",
+   "phrase_bytes": 113,
+   "fits_seed_budget": true,
+   "id": "P022"
+  },
+  {
+   "beats": 8,
+   "phrase": "b6:0.5 b7:1 1+:0.5 b6:0.5 5:0.5 4:0.5 4:0.5 4:0.5 4:0.5 3:0.5 4:0.5 3:0.5 b2:0.5 1:0.25 r:0.75",
+   "end_degree": "1",
+   "cadence_class": "ajuz",
+   "role_hint": "ajuz (assumes section end)",
+   "mode_hint": "hijaz-like",
+   "source_midi": [
+    75,
+    77,
+    79,
+    75,
+    74,
+    72,
+    72,
+    72,
+    72,
+    71,
+    72,
+    71,
+    68,
+    67
+   ],
+   "source_bars": [
+    129,
+    131
+   ],
+   "register": "high",
+   "distinct_pitches": 8,
+   "repeated_note_ratio": 0.231,
+   "span": 12,
+   "source_id": "suno-0626.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0626.abc",
+   "phrase_bytes": 94,
+   "fits_seed_budget": true,
+   "id": "P023"
+  },
+  {
+   "beats": 8,
+   "phrase": "4+:0.75 b3+:0.25 b2+:0.5 1+:0.5 r:0.75 5+:0.25 5+:0.5 5+:0.5 5+:0.75 3+:0.25 5+:0.5 3+:0.5 b6+:0.5 b6+:0.5 5+:0.5 5+:0.5",
+   "end_degree": "5",
+   "cadence_class": "ajuz",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "hijaz-like",
+   "source_midi": [
+    81,
+    79,
+    77,
+    76,
+    83,
+    83,
+    83,
+    83,
+    80,
+    83,
+    80,
+    84,
+    84,
+    83,
+    83
+   ],
+   "source_bars": [
+    106,
+    109
+   ],
+   "register": "high",
+   "distinct_pitches": 7,
+   "repeated_note_ratio": 0.357,
+   "span": 8,
+   "source_id": "suno-0646.abc",
+   "source_key": "Em",
+   "cluster": "S:suno-0646.abc",
+   "phrase_bytes": 120,
+   "fits_seed_budget": true,
+   "id": "P024"
+  },
+  {
+   "beats": 16,
+   "phrase": "b7-:1 r:0.5 b2:1 1:1 b7-:0.5 b7-:1 r:0.5 1:0.5 b2:0.5 b3:1 b2:0.5 1:0.5 1:1 b2:0.5 b3:0.5 b3:0.5 4:0.5 4:0.5 5:4",
+   "end_degree": "5",
+   "cadence_class": "sadr",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "kurd-like",
+   "source_midi": [
+    65,
+    68,
+    67,
+    65,
+    65,
+    67,
+    68,
+    70,
+    68,
+    67,
+    67,
+    68,
+    70,
+    70,
+    72,
+    72,
+    74
+   ],
+   "source_bars": [
+    61,
+    64
+   ],
+   "register": "mid",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.25,
+   "span": 9,
+   "source_id": "suno-0031.abc",
+   "source_key": "Gm",
+   "cluster": "C012",
+   "phrase_bytes": 112,
+   "fits_seed_budget": true,
+   "id": "P025"
+  },
+  {
+   "beats": 8,
+   "phrase": "b2:0.5 b7-:0.25 b7-:0.5 b7-:0.5 3:0.5 4:0.5 5:0.5 5:0.5 r:0.5 b6:0.5 b6:0.5 b6:0.25 5:0.25 4:0.25 5:0.25 5:0.25 4:0.25 4:1 r:0.25",
+   "end_degree": "4",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "hijaz-like",
+   "source_midi": [
+    68,
+    65,
+    65,
+    65,
+    71,
+    72,
+    74,
+    74,
+    75,
+    75,
+    75,
+    74,
+    72,
+    74,
+    74,
+    72,
+    72
+   ],
+   "source_bars": [
+    77,
+    78
+   ],
+   "register": "high",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.438,
+   "span": 10,
+   "source_id": "suno-0049.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0049.abc",
+   "phrase_bytes": 129,
+   "fits_seed_budget": true,
+   "id": "P026"
+  },
+  {
+   "beats": 8,
+   "phrase": "4:0.5 b3:0.25 b2:0.25 r:0.5 4:0.5 4:0.75 b3:0.5 5:0.5 4:0.25 4:0.5 b2:0.25 1:0.25 r:0.5 4:0.5 4:0.75 b3:0.5 5:0.5 4:0.25",
+   "end_degree": "4",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "kurd-like",
+   "source_midi": [
+    72,
+    70,
+    68,
+    72,
+    72,
+    70,
+    74,
+    72,
+    72,
+    68,
+    67,
+    72,
+    72,
+    70,
+    74,
+    72
+   ],
+   "source_bars": [
+    182,
+    185
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.2,
+   "span": 7,
+   "source_id": "suno-0061.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0061.abc",
+   "phrase_bytes": 120,
+   "fits_seed_budget": true,
+   "id": "P027"
+  },
+  {
+   "beats": 8,
+   "phrase": "b7:0.5 5:0.5 4:0.5 5:0.5 b6:0.5 4:0.5 3:0.5 4:0.5 5:0.5 4:0.5 r:0.5 b2:0.5 b2:0.5 3:0.5 3:0.5 4:0.5",
+   "end_degree": "4",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "hijaz-like",
+   "source_midi": [
+    70,
+    67,
+    65,
+    67,
+    68,
+    65,
+    64,
+    65,
+    67,
+    65,
+    61,
+    61,
+    64,
+    64,
+    65
+   ],
+   "source_bars": [
+    180,
+    181
+   ],
+   "register": "mid",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.143,
+   "span": 9,
+   "source_id": "suno-0070.abc",
+   "source_key": "C",
+   "cluster": "S:suno-0070.abc",
+   "phrase_bytes": 99,
+   "fits_seed_budget": true,
+   "id": "P028"
+  },
+  {
+   "beats": 8,
+   "phrase": "b6:0.5 b6:1 b6:1 1+:1 b7:0.5 b6:0.5 5:1 5:1 5:1 4:0.5",
+   "end_degree": "4",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "minor-like",
+   "source_midi": [
+    70,
+    70,
+    70,
+    74,
+    72,
+    70,
+    69,
+    69,
+    69,
+    67
+   ],
+   "source_bars": [
+    164,
+    166
+   ],
+   "register": "mid",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.444,
+   "span": 7,
+   "source_id": "suno-0072.abc",
+   "source_key": "Dm",
+   "cluster": "S:suno-0072.abc",
+   "phrase_bytes": 53,
+   "fits_seed_budget": true,
+   "id": "P029"
+  },
+  {
+   "beats": 16,
+   "phrase": "2:1 1:1 b7-:1 6-:1 b7-:1 1:1 b6-:1 5-:1 3-:0.5 4-:0.5 5-:2 b6-:1 5-:1 4-:1 3-:0.5 4-:0.5 5-:1",
+   "end_degree": "5",
+   "cadence_class": "sadr",
+   "role_hint": "sadr_or_ajuz",
+   "mode_hint": "rast-like",
+   "source_midi": [
+    69,
+    67,
+    65,
+    64,
+    65,
+    67,
+    63,
+    62,
+    59,
+    60,
+    62,
+    63,
+    62,
+    60,
+    59,
+    60,
+    62
+   ],
+   "source_bars": [
+    51,
+    54
+   ],
+   "register": "low",
+   "distinct_pitches": 8,
+   "repeated_note_ratio": 0.0,
+   "span": 10,
+   "source_id": "suno-0073.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0073.abc",
+   "phrase_bytes": 93,
+   "fits_seed_budget": true,
+   "id": "P030"
+  },
+  {
+   "beats": 8,
+   "phrase": "b3:0.5 b2:0.5 b3:0.5 4:0.25 r:0.25 b2:0.5 1:0.5 1:0.25 r:0.75 5:0.5 b3:0.5 4:0.5 r:0.5 5:0.5 b3:0.5 4:0.5 r:0.5",
+   "end_degree": "4",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "kurd-like",
+   "source_midi": [
+    70,
+    68,
+    70,
+    72,
+    68,
+    67,
+    67,
+    74,
+    70,
+    72,
+    74,
+    70,
+    72
+   ],
+   "source_bars": [
+    97,
+    99
+   ],
+   "register": "mid",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.083,
+   "span": 7,
+   "source_id": "suno-0077.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0077.abc",
+   "phrase_bytes": 111,
+   "fits_seed_budget": true,
+   "id": "P031"
+  },
+  {
+   "beats": 8,
+   "phrase": "4:0.5 2+:1 b7:1 b6:0.5 r:0.5 5:1.5 2+:2 r:1",
+   "end_degree": "2",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    67,
+    76,
+    72,
+    70,
+    69,
+    76
+   ],
+   "source_bars": [
+    186,
+    187
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.0,
+   "span": 9,
+   "source_id": "suno-0091.abc",
+   "source_key": "Dm",
+   "cluster": "S:suno-0091.abc",
+   "phrase_bytes": 43,
+   "fits_seed_budget": true,
+   "id": "P032"
+  },
+  {
+   "beats": 8,
+   "phrase": "5:0.5 7:0.5 5:0.5 5:0.5 7:1 4:1 b6:1 1+:1 b3+:1 2+:0.5 r:0.5",
+   "end_degree": "2",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    67,
+    71,
+    67,
+    67,
+    71,
+    65,
+    68,
+    72,
+    75,
+    74
+   ],
+   "source_bars": [
+    93,
+    95
+   ],
+   "register": "mid",
+   "distinct_pitches": 7,
+   "repeated_note_ratio": 0.111,
+   "span": 10,
+   "source_id": "suno-0099.abc",
+   "source_key": "Cm",
+   "cluster": "C030",
+   "phrase_bytes": 60,
+   "fits_seed_budget": true,
+   "id": "P033"
+  },
+  {
+   "beats": 8,
+   "phrase": "b7-:1 1:1 2:1 b3:1 4:1 5:1 b6:1 4:1",
+   "end_degree": "4",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    62,
+    64,
+    66,
+    67,
+    69,
+    71,
+    72,
+    69
+   ],
+   "source_bars": [
+    19,
+    20
+   ],
+   "register": "mid",
+   "distinct_pitches": 7,
+   "repeated_note_ratio": 0.0,
+   "span": 10,
+   "source_id": "suno-0125.abc",
+   "source_key": "Em",
+   "cluster": "C020",
+   "phrase_bytes": 35,
+   "fits_seed_budget": true,
+   "id": "P034"
+  },
+  {
+   "beats": 8,
+   "phrase": "1+:0.5 4+:1 r:0.5 4+:0.5 4+:0.5 4+:0.25 5+:0.25 4+:0.5 3+:0.5 b2+:0.5 1+:0.5 1+:0.5 1+:0.5 4+:1 r:0.5",
+   "end_degree": "4",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "hijaz-like",
+   "source_midi": [
+    72,
+    77,
+    77,
+    77,
+    77,
+    79,
+    77,
+    76,
+    73,
+    72,
+    72,
+    72,
+    77
+   ],
+   "source_bars": [
+    54,
+    58
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.417,
+   "span": 7,
+   "source_id": "suno-0193.abc",
+   "source_key": "Cm",
+   "cluster": "S:suno-0193.abc",
+   "phrase_bytes": 101,
+   "fits_seed_budget": true,
+   "id": "P035"
+  },
+  {
+   "beats": 8,
+   "phrase": "2+:0.75 b7:0.75 2+:0.5 2+:0.5 1+:0.5 b7:0.5 6:0.5 5:1 r:0.5 5:0.5 5:0.5 b7:0.5 2+:0.5 2+:0.5",
+   "end_degree": "2",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "rast-like",
+   "source_midi": [
+    76,
+    72,
+    76,
+    76,
+    74,
+    72,
+    71,
+    69,
+    69,
+    69,
+    72,
+    76,
+    76
+   ],
+   "source_bars": [
+    61,
+    64
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.333,
+   "span": 7,
+   "source_id": "suno-0228.abc",
+   "source_key": "Dm",
+   "cluster": "S:suno-0228.abc",
+   "phrase_bytes": 92,
+   "fits_seed_budget": true,
+   "id": "P036"
+  },
+  {
+   "beats": 8,
+   "phrase": "b3:0.5 b3:0.5 b3:0.5 b2:0.5 4:0.5 b3:0.5 b2:0.5 r:0.5 b7:0.5 b7:0.5 6:0.5 6:0.5 4:0.5 b5:0.5 4:0.5 4:0.5",
+   "end_degree": "4",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "bayati-like",
+   "source_midi": [
+    70,
+    70,
+    70,
+    68,
+    72,
+    70,
+    68,
+    77,
+    77,
+    76,
+    76,
+    72,
+    73,
+    72,
+    72
+   ],
+   "source_bars": [
+    40,
+    41
+   ],
+   "register": "high",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.357,
+   "span": 9,
+   "source_id": "suno-0329.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0329.abc",
+   "phrase_bytes": 104,
+   "fits_seed_budget": true,
+   "id": "P037"
+  },
+  {
+   "beats": 8,
+   "phrase": "b3+:1.5 4+:0.25 b3+:0.25 b2+:1 r:0.5 b7:0.25 1+:0.25 b2+:0.5 b2+:0.5 b2+:0.5 b3+:0.25 b2+:0.25 1+:1 r:0.5 b3+:0.25 4+:0.25",
+   "end_degree": "4",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "kurd-like",
+   "source_midi": [
+    77,
+    79,
+    77,
+    75,
+    72,
+    74,
+    75,
+    75,
+    75,
+    77,
+    75,
+    74,
+    77,
+    79
+   ],
+   "source_bars": [
+    15,
+    16
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.154,
+   "span": 7,
+   "source_id": "suno-0350.abc",
+   "source_key": "Dm",
+   "cluster": "S:suno-0350.abc",
+   "phrase_bytes": 122,
+   "fits_seed_budget": true,
+   "id": "P038"
+  },
+  {
+   "beats": 8,
+   "phrase": "b7:1 6:0.5 b7:0.5 6:0.5 b7:0.5 4:0.5 r:0.5 b7:1 6:0.5 b7:0.5 6:0.5 1+:0.5 2+:0.5 r:0.5",
+   "end_degree": "2",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "rast-like",
+   "source_midi": [
+    80,
+    79,
+    80,
+    79,
+    80,
+    75,
+    80,
+    79,
+    80,
+    79,
+    82,
+    84
+   ],
+   "source_bars": [
+    15,
+    16
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.0,
+   "span": 9,
+   "source_id": "suno-0413.abc",
+   "source_key": "Bbm",
+   "cluster": "S:suno-0413.abc",
+   "phrase_bytes": 86,
+   "fits_seed_budget": true,
+   "id": "P039"
+  },
+  {
+   "beats": 8,
+   "phrase": "1+:1 b7:0.5 b6:1 5:0.5 4:0.5 b3:0.5 1+:1 b7:0.5 b6:1 5:0.5 4:0.5 4:0.5",
+   "end_degree": "4",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "minor-like",
+   "source_midi": [
+    77,
+    75,
+    73,
+    72,
+    70,
+    68,
+    77,
+    75,
+    73,
+    72,
+    70,
+    70
+   ],
+   "source_bars": [
+    130,
+    131
+   ],
+   "register": "high",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.091,
+   "span": 9,
+   "source_id": "suno-0456.abc",
+   "source_key": "Fm",
+   "cluster": "S:suno-0456.abc",
+   "phrase_bytes": 70,
+   "fits_seed_budget": true,
+   "id": "P040"
+  },
+  {
+   "beats": 8,
+   "phrase": "1+:0.5 6:0.25 b7:2 r:0.25 6:0.5 5:0.5 1+:0.5 2+:0.25 1+:0.25 2+:0.5 b7:0.5 1+:0.5 b7:0.25 1+:0.75 2+:0.25 r:0.25",
+   "end_degree": "2",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "rast-like",
+   "source_midi": [
+    79,
+    76,
+    77,
+    76,
+    74,
+    79,
+    81,
+    79,
+    81,
+    77,
+    79,
+    77,
+    79,
+    81
+   ],
+   "source_bars": [
+    80,
+    83
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.0,
+   "span": 7,
+   "source_id": "suno-0499.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0499.abc",
+   "phrase_bytes": 112,
+   "fits_seed_budget": true,
+   "id": "P041"
+  },
+  {
+   "beats": 8,
+   "phrase": "2+:0.25 1+:0.25 1+:0.25 b7:0.25 1+:0.25 1+:0.25 1+:0.25 b7:0.25 b7:0.25 b7:0.25 b6:0.25 5:0.25 5:0.25 r:0.75 2+:4",
+   "end_degree": "2",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    78,
+    76,
+    76,
+    74,
+    76,
+    76,
+    76,
+    74,
+    74,
+    74,
+    72,
+    71,
+    71,
+    78
+   ],
+   "source_bars": [
+    29,
+    30
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.462,
+   "span": 7,
+   "source_id": "suno-0528.abc",
+   "source_key": "Em",
+   "cluster": "S:suno-0528.abc",
+   "phrase_bytes": 113,
+   "fits_seed_budget": true,
+   "id": "P042"
+  },
+  {
+   "beats": 8,
+   "phrase": "1+:0.5 1+:0.5 1+:0.5 b2+:1.5 b2+:0.5 3+:0.5 3+:0.5 b2+:0.5 b2+:0.5 4+:0.5 4+:0.25 r:0.25 3+:0.5 b2+:0.5 2+:0.5",
+   "end_degree": "2",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "hijaz-like",
+   "source_midi": [
+    77,
+    77,
+    77,
+    78,
+    78,
+    81,
+    81,
+    78,
+    78,
+    82,
+    82,
+    81,
+    78,
+    79
+   ],
+   "source_bars": [
+    27,
+    29
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.462,
+   "span": 5,
+   "source_id": "suno-0537.abc",
+   "source_key": "F",
+   "cluster": "S:suno-0537.abc",
+   "phrase_bytes": 110,
+   "fits_seed_budget": true,
+   "id": "P043"
+  },
+  {
+   "beats": 16,
+   "phrase": "b7:0.75 b6:0.75 5:1.5 4:1 b7:0.75 b6:0.75 5:1.5 4:0.5 b3:0.5 4:0.75 5:0.75 4:1 b3:0.5 2:1 b3:0.75 4:0.75 b3:1.5 2:1",
+   "end_degree": "2",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    77,
+    75,
+    74,
+    72,
+    77,
+    75,
+    74,
+    72,
+    70,
+    72,
+    74,
+    72,
+    70,
+    69,
+    70,
+    72,
+    70,
+    69
+   ],
+   "source_bars": [
+    398,
+    405
+   ],
+   "register": "high",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.0,
+   "span": 8,
+   "source_id": "suno-0583.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0583.abc",
+   "phrase_bytes": 115,
+   "fits_seed_budget": true,
+   "id": "P044"
+  },
+  {
+   "beats": 8,
+   "phrase": "5:1 4:0.5 b3:1 4:1 b3:1 r:0.5 b7:1 b6:1 4:1",
+   "end_degree": "4",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "minor-like",
+   "source_midi": [
+    68,
+    66,
+    64,
+    66,
+    64,
+    71,
+    69,
+    66
+   ],
+   "source_bars": [
+    43,
+    44
+   ],
+   "register": "mid",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.0,
+   "span": 7,
+   "source_id": "suno-0615.abc",
+   "source_key": "C#m",
+   "cluster": "S:suno-0615.abc",
+   "phrase_bytes": 43,
+   "fits_seed_budget": true,
+   "id": "P045"
+  },
+  {
+   "beats": 8,
+   "phrase": "1:0.5 1:0.25 1:0.75 b3:0.25 5:0.25 5:0.25 r:0.5 5:0.75 b7:0.25 6:0.75 4:0.25 4:0.75 2:0.25 b3:0.75 r:0.25 b3:0.75 2:0.25 2:0.25",
+   "end_degree": "2",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    67,
+    67,
+    67,
+    70,
+    74,
+    74,
+    74,
+    77,
+    76,
+    72,
+    72,
+    69,
+    70,
+    70,
+    69,
+    69
+   ],
+   "source_bars": [
+    149,
+    152
+   ],
+   "register": "mid",
+   "distinct_pitches": 7,
+   "repeated_note_ratio": 0.467,
+   "span": 10,
+   "source_id": "suno-0656.abc",
+   "source_key": "Gm",
+   "cluster": "S:suno-0656.abc",
+   "phrase_bytes": 127,
+   "fits_seed_budget": true,
+   "id": "P046"
+  },
+  {
+   "beats": 8,
+   "phrase": "5:1 1+:0.5 r:0.5 1+:0.75 2+:0.75 b3+:0.5 b6:0.75 b7:0.75 1+:0.25 2+:0.25 b7:0.75 1+:0.75 2+:0.5",
+   "end_degree": "2",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "nahawand-like",
+   "source_midi": [
+    77,
+    82,
+    82,
+    84,
+    85,
+    78,
+    80,
+    82,
+    84,
+    80,
+    82,
+    84
+   ],
+   "source_bars": [
+    55,
+    58
+   ],
+   "register": "high",
+   "distinct_pitches": 6,
+   "repeated_note_ratio": 0.091,
+   "span": 8,
+   "source_id": "suno-0660.abc",
+   "source_key": "Bbm",
+   "cluster": "S:suno-0660.abc",
+   "phrase_bytes": 95,
+   "fits_seed_budget": true,
+   "id": "P047"
+  },
+  {
+   "beats": 8,
+   "phrase": "b7:0.5 1+:0.5 2+:3 b3+:2 4+:2",
+   "end_degree": "4",
+   "cadence_class": "sadr",
+   "role_hint": "sadr",
+   "mode_hint": "minor-like",
+   "source_midi": [
+    74,
+    76,
+    78,
+    79,
+    81
+   ],
+   "source_bars": [
+    86,
+    87
+   ],
+   "register": "high",
+   "distinct_pitches": 5,
+   "repeated_note_ratio": 0.0,
+   "span": 7,
+   "source_id": "suno-0667.abc",
+   "source_key": "Em",
+   "cluster": "S:suno-0667.abc",
+   "phrase_bytes": 29,
+   "fits_seed_budget": true,
+   "id": "P048"
+  }
+ ]
+}
