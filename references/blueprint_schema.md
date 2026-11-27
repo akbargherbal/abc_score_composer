@@ -173,7 +173,8 @@ part of a Blueprint: `meta`, sections, bars, one `ch` per bar, and one `syl`
 reference per bar. The bars follow the shatr/bayt budget (4/8, or 2/4 for a
 line of eight syllables or fewer). For a repeated section named exactly the
 same (`Chorus`, `Chorus`), the later one uses `same_as` and a new `syl` list.
-Fill only `voc` and `ins`; the compiler adds a missing breath rest.
+Fill `voc`/`ins`; `ch` and `syl` are defaults that the Fill may override. The
+compiler adds a missing breath rest.
 
 ### Fill
 
