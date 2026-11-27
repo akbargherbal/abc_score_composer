@@ -1,0 +1,38 @@
+abc-score-writer 0.2.2 baseline
+commit 99a6919 (tag v0.2.2), measured 2026-11-27 on Linux, Python 3.13.18,
+abc2midi 4.88 (February 22 2024).
+
+Command:
+    python3 scripts/measure_footprint.py --label 0.2.2
+
+Output:
+label       skill_B  skill_W   mand_B   mand_W    bp_B  skel_B agent_B  bars   B/bar   ok_W  fail_W
+0.2.2          5824      862    26484     3290    3444    1352    1241    30    27.2     13      32
+
+Test suite:
+    python3 tests/test_roundtrip.py
+    Ran 14 tests in 1.841s
+    OK (skipped=1)
+
+The single skip is MinerTests.test_miner_smoke: the 670-song corpus is not
+present in this checkout. With the corpus present and abc2midi installed the
+0.2.2 changelog reported 14 passing, 0 skipped.
+
+File sizes:
+    SKILL.md                              5,824 B
+    dist/abc-score-writer-0.2.2.skill    80,391 B
+    dist/abc-score-writer-0.2.2.zip      80,391 B
+    assets/corpus_profile.json           21,020 B
+
+Notes / differences from the 0.2.2 changelog (today's measurement is
+authoritative):
+- SKILL.md is 5,824 B here; the changelog says 5,808 B. The packaged 0.2.2
+  SKILL.md is also 5,824 B, so the changelog figure is stale.
+- Mandatory reading is 26,484 B here; the changelog says 26,468 B. The
+  16-byte difference is the same SKILL.md difference.
+- Card words are 13 (success) and 32 (failure), matching the changelog.
+- The corpus-based miner test skips in this checkout; this is environmental,
+  not a regression.
+
+Baseline used by the Phase 5 guard: mandatory reading 26,484 B. The guard fails
+if 0.2.3 mandatory reading exceeds 26,634 B (baseline + 150 B).
