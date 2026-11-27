@@ -1,0 +1,42 @@
+abc-score-writer 0.2.3 footprint
+Measured 2026-11-27 on Linux, Python 3.13.18, abc2midi 4.88.
+
+Command:
+    python3 scripts/measure_footprint.py --label 0.2.3
+
+Output:
+label       skill_B  skill_W   mand_B   mand_W    bp_B  skel_B agent_B  bars   B/bar   ok_W  fail_W  seed_B  nov_B    zip_B
+0.2.3          5945      884    26605     3312    3444    1352    1241    30    27.2     13      32     343     66   712630
+
+Baseline (docs/footprint_0.2.2.txt):
+    skill_B 5824, mand_B 26484, seed_B n/a, nov_B n/a, zip_B n/a
+    card 13/32 words
+
+Deltas:
+    SKILL.md:        +121 B (5,824 -> 5,945), under the +150 B cap.
+    Mandatory:       +121 B (26,484 -> 26,605); the only growth is SKILL.md.
+    seed_block_B:    343 B (largest across the sample prompts; cap 400 B).
+    novelty_line_B:  66 B (verbose; the compact card is silent on status=ok).
+    package_zip_B:   712,630 B (zipfile build without directory entries).
+
+Packaged release (dist/, built with zip -r from a clean staging copy):
+    dist/abc-score-writer-0.2.3.zip    715,052 B
+    dist/abc-score-writer-0.2.3.skill  715,052 B
+    (from 80,391 B for 0.2.2, about 8.9x)
+
+The new assets are script-read and are NOT in mandatory_files():
+    assets/phrase_bank.json                   34,788 B
+    assets/corpus_fingerprints.bin           630,382 B
+    assets/corpus_profile.dedup.candidate.json 20,371 B
+    scripts/novelty_check.py                  14,736 B
+
+Tests:
+    With abc2midi and the corpus present:
+        32 pass, 0 skipped.
+    In a bare checkout without the 670-song corpus:
+        31 pass, 1 skipped (the miner smoke test).
+    From an unzipped dist/abc-score-writer-0.2.3.zip (corpus symlinked):
+        32 pass, 0 skipped.
+
+Guard:
+    Mandatory reading 26,605 B <= 26,484 B baseline + 150 B. Guard passes.

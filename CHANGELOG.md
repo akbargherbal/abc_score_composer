@@ -74,11 +74,12 @@
   `assets/example_prompt.txt`, and `tests/prompts/*.txt` (cap 400 B).
 - Novelty line: 66 B in verbose; zero words on a compact `ok` card.
 - Package: `dist/abc-score-writer-0.2.3.zip` and `.skill` are identical at
-  715,032 B (from 80,391 B, about 8.9x; the 630 KB fingerprint bank does not
-  compress). `measure_footprint.py`'s `package_zip_B` reports 712,610 B because
-  it builds the zip without directory entries.
-- Tests: 32 pass, 0 skipped with abc2midi and the corpus present; 13 pass,
-  1 skipped (miner, corpus absent) in a bare checkout.
+  about 715 KB (from 80,391 B, about 8.9x; the 630 KB fingerprint bank does not
+  compress). `measure_footprint.py`'s `package_zip_B` reports about 712.6 KB
+  because it builds the zip without directory entries. Exact build sizes are
+  in `docs/footprint_0.2.3.txt`.
+- Tests: 32 pass, 0 skipped with abc2midi and the corpus present; 31 pass,
+  1 skipped (the miner smoke test) in a bare checkout.
 
 ## 0.2.2
 
