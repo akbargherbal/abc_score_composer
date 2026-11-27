@@ -73,8 +73,10 @@
 - Largest seed block: 343 B across `tests/sample_prompt.txt`,
   `assets/example_prompt.txt`, and `tests/prompts/*.txt` (cap 400 B).
 - Novelty line: 66 B in verbose; zero words on a compact `ok` card.
-- Package zip: 712,520 B (from 80,391 B, about 8.9x; the 630 KB fingerprint
-  bank does not compress).
+- Package: `dist/abc-score-writer-0.2.3.zip` and `.skill` are identical at
+  715,032 B (from 80,391 B, about 8.9x; the 630 KB fingerprint bank does not
+  compress). `measure_footprint.py`'s `package_zip_B` reports 712,610 B because
+  it builds the zip without directory entries.
 - Tests: 32 pass, 0 skipped with abc2midi and the corpus present; 13 pass,
   1 skipped (miner, corpus absent) in a bare checkout.
 

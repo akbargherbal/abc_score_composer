@@ -31,12 +31,11 @@ plagiarism verdict.
 | `assets/corpus_fingerprints.bin` | 630,382 | `d2bfa38503e8ba6cdaebbfc09b502a4699ac97b038352fbbd0a63a6f1c6b4830` |
 | `assets/corpus_profile.dedup.candidate.json` | 20,371 | `69980610e4db09953fb8473e424ac637e5220103125f440ab3b50d90104df430` |
 | `scripts/novelty_check.py` | 14,736 | `c8e33b842bcd3ceae01977cc01ce0437c6c64c4a8580d7e4a1597d254f0d25c6` |
-| `tests/fixtures/suno-0100.abc` | 4,563 | see below |
+| `tests/fixtures/suno-0100.abc` | 4,563 | `f819582caf1eca48225f87cccb55f7bf91db1afa0e16063c5e767c343597d2d7` |
 
 `tests/fixtures/suno-0100.abc` is an unmodified corpus song from
 `670_arabic_songs_abc_scores.zip` (same abcsim commit). It exists only as the
 positive control for the novelty check; it is not used at composition time.
-Its SHA-256 is recorded by the test suite, not used as an input.
 
 ## What is shipped and what is not
 
