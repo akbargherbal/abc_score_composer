@@ -267,6 +267,30 @@ class SkeletonTests(unittest.TestCase):
             want = f.read()
         self.assertEqual(got, want)
 
+    def test_fill_can_override_ch_and_syl_per_bar(self):
+        """A fill dict or 4-list may override the skeleton's ch/syl defaults."""
+        tmp = tempfile.mkdtemp(prefix="abc_fill_override_")
+        fill = load(os.path.join(ASSETS, "example_fill.json"))
+        rows = fill["fill"]["verse_1"]
+        rows[0] = {"voc": "1:1 b2:1 1:2", "ins": rows[0][1],
+                   "ch": "Gm", "syl": "a b c"}
+        rows[1] = ["2:1 1:1 b7-:2", rows[1][1], "Bb", "d e f"]
+        path = os.path.join(tmp, "fill.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(fill, f)
+        abc = os.path.join(tmp, "song.abc")
+        p = run([os.path.join(SCRIPTS, "compile_abc.py"),
+                 "--skeleton", os.path.join(ASSETS, "example_blueprint_skeleton.json"),
+                 "--fill", path, "-o", abc,
+                 "--intake", os.path.join(ASSETS, "example_intake.json"),
+                 "--strict"])
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        with open(abc, encoding="utf-8") as f:
+            text = f.read()
+        self.assertIn('"Gm"', text)
+        self.assertIn('"Bb"', text)
+        self.assertNotIn("syl_mismatch", p.stdout + p.stderr)
+
     def test_verse_bar_count_is_rejected(self):
         tmp = tempfile.mkdtemp(prefix="abc_verse_")
         bp = {

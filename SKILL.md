@@ -19,8 +19,10 @@ Blueprint; Python does the notation math and validation. Never hand-write ABC.
 
 **Loop:** `intake -> Blueprint -> compile -> inspect -> patch Blueprint -> release`
 
-At most **1 musical patch round** after the first clean compile. Authoring
-fixes (a syllable range, an octave slip) are not musical rounds. If the same
+After the first clean compile, fix every **variety flag** and every
+`TARGET edited`/`DURATION` flag by editing **only the flagged lines or bars**:
+at most **2** rounds. A round that touches unflagged bars is not cheap; avoid
+it. Authoring fixes (a syllable range, an octave slip) are exempt. If the same
 structural problem survives one round, stop and report it.
 
 ## 1. Intake
@@ -35,9 +37,10 @@ Read the printed table. Each line gets an id (`verse_1.L1`), a role (`sadr` or
 role comes from a trailing `...`, otherwise it alternates. Arabic with
 *tashkeel* is counted from the vowel marks; unvocalized lines are `estimated`.
 
-`blueprint_skeleton.json` already contains the sections, bars, `ch`, and `syl`
-ranges, including `same_as` for a repeated chorus. **Fill only `voc` and `ins`.**
-Do not retype `ch` or `syl`.
+`blueprint_skeleton.json` already contains the sections, bars, `ch`, `syl`
+ranges and `meta.targets`, including `same_as` for a repeated chorus. These are
+**defaults**: fill `voc`/`ins`, and override `ch` or `syl` per bar when the words
+or cadence call for it (see `blueprint_schema.md`). Do not edit `meta.targets`.
 
 ## 2. Write `fill.json`
 
@@ -48,9 +51,11 @@ Write one compact fill file, not a full Blueprint:
  "fill":{"verse_1":[["1:1 b2:1 1:2","rest"],["4:1 b3:1 4:2","1:4"]]}}
 ```
 
-Only `voc`/`ins`, one `[voc, ins]` pair per skeleton bar, in section order. Do
-not fill a `same_as` section; it copies its source. `meta`/`motifs` are
-optional. `rest` fills a bar; `r:<beats>` is a timed rest.
+One row per skeleton bar, in section order: `[voc, ins]`, or a dict with
+`voc`, `ins`, `ch`, `syl`. Do not fill a `same_as` section; it copies its source.
+`meta`/`motifs` are optional. `rest` fills a bar; `r:<beats>` is a timed rest.
+Write each line's rhythm and contour for **its own words**; do not loop one
+template over lines or sections.
 
 **Note grammar:** `degree:beats`. Degrees `1,b2,2,b3,3,4,b5,5,b6,6,b7,7`
 (also `#4`). Trailing `+`/`-` shift octaves. Durations are quarter-note beats
@@ -100,6 +105,8 @@ Deliver `song.abc` when:
 - every bar sums, both voices align, and every pitch is in range;
 - `syl` covers the vocal bars and no intake line is unused;
 - CRAFT is advisory: mention any flag, do not chase it;
+- variety flags are fixed or explicitly reported as accepted; no `TARGET edited`
+  unless the owner asked;
 - the chorus is above the verse and the vocal span fits one singer;
 - the file has the corpus header and no `w:` lines.
 

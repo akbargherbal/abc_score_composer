@@ -178,7 +178,9 @@ Fill only `voc` and `ins`; the compiler adds a missing breath rest.
 ### Fill
 
 `compile_abc.py --skeleton sk.json --fill fill.json` takes `fill[section]` as
-one `[voc, ins]` row per skeleton bar, in order. `same_as` sections are copied
+one `[voc, ins]` row per skeleton bar, in order. A row may instead be a dict
+with `voc`, `ins`, `ch`, `syl` (or a `[voc, ins, ch, syl]` list): `ch`/`syl`
+override the skeleton's defaults for that bar. `same_as` sections are copied
 and must not appear. `meta`/`motifs` are optional.
 
 ## Report line map

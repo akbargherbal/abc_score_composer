@@ -520,9 +520,11 @@ def merge_fill(skeleton: dict, fill: dict) -> dict:
     """Merge a compact ``fill.json`` into a generated skeleton.
 
     The skeleton owns meta, sections, bars, chords, and syl ranges.  The fill
-    owns only the musical strings, one [voc, ins] pair per bar in section
-    order.  A ``same_as`` section is filled from its source and must not appear
-    in the fill.
+    owns the musical strings, one row per bar in section order.  A row is a
+    ``[voc, ins]`` pair, a ``[voc, ins, ch, syl]`` list, or a dict with any of
+    those keys (``voc``/``ins`` default to rests, ``ch``/``syl`` override the
+    skeleton).  A ``same_as`` section is filled from its source and must not
+    appear in the fill.
     """
     merged = copy.deepcopy(skeleton)
     fill_meta = fill.get("meta") or {}
@@ -566,14 +568,35 @@ def merge_fill(skeleton: dict, fill: dict) -> dict:
                 f"section {sid!r} needs {len(bars)} [voc,ins] rows, got {got}",
             )
         for i, row in enumerate(rows):
-            if not isinstance(row, (list, tuple)) or len(row) != 2:
+            ch = syl = None
+            if isinstance(row, dict):
+                unknown_keys = sorted(set(row) - {"voc", "ins", "ch", "syl"})
+                if unknown_keys:
+                    raise CompileError(
+                        "bad_fill",
+                        f"section {sid!r} bar {i + 1} has unknown key(s): "
+                        f"{', '.join(unknown_keys)}",
+                    )
+                voc = row.get("voc")
+                ins = row.get("ins")
+                ch = row.get("ch")
+                syl = row.get("syl")
+            elif isinstance(row, (list, tuple)) and len(row) in (2, 4):
+                voc, ins = row[0], row[1]
+                if len(row) == 4:
+                    ch, syl = row[2], row[3]
+            else:
                 raise CompileError(
                     "bad_fill",
-                    f"section {sid!r} bar {i + 1} must be [voc, ins]",
+                    f"section {sid!r} bar {i + 1} must be [voc, ins], "
+                    f"[voc, ins, ch, syl], or a dict of those keys",
                 )
-            voc, ins = row
             bars[i]["voc"] = "rest" if voc in (None, "") else str(voc)
             bars[i]["ins"] = "rest" if ins in (None, "") else str(ins)
+            if ch is not None:
+                bars[i]["ch"] = str(ch)
+            if syl is not None:
+                bars[i]["syl"] = syl
     return merged
 
 
