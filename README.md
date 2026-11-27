@@ -70,23 +70,63 @@ python3 scripts/mine_corpus.py --corpus /path/to/670_arabic_songs_abc_scores \
   --out assets/corpus_profile.json
 ```
 
+## Optional abcsim assets (0.2.3)
+
+Three assets from `akbargherbal/abcsim` are shipped, all optional and read by
+scripts rather than by the model. Their provenance (tag, commit, SHA-256, and
+the AI-generated source corpus) is in `assets/PROVENANCE.md`.
+
+- **Phrase seeds.** `assets/phrase_bank.json` holds 48 real vocal phrases in
+  the Blueprint `degree:beats` grammar. Intake prints up to three matching
+  8-beat seeds with `--seeds N` (default `0`, off; cap 3):
+
+  ```bash
+  python3 scripts/intake_lyrics.py --in prompt.txt -o intake.json \
+    --skeleton blueprint_skeleton.json --seeds 3
+  ```
+
+  Seeds are stdout-only: `intake.json` and the skeleton are unchanged. They
+  are offered only for 8-beat lines; a 16-beat shatr gets no seed rather than a
+  mismatched one. `mode=any` marks a fallback when the maqam has no matching
+  phrase. The whole block is capped at 400 bytes and carries no source key.
+- **Novelty advisory.** `scripts/novelty_check.py` compares a compiled melody
+  with `assets/corpus_fingerprints.bin` (a 630 KB bottom-256 sketch of 596
+  deduped songs, stamped threshold `0.08`). The inspector prints a `NOVELTY`
+  line in the compact card only when `status=close` (at most ~120 bytes) and
+  always in `--verbose`. It never fails a build or rewrites a melody.
+- **Dedup profile candidate.** `assets/corpus_profile.dedup.candidate.json` is
+  for inspection only; `assets/corpus_profile.json` is unchanged.
+
+Coverage is uneven: the bank has 8 Kurd, 8 hijaz, 8 rast, 15 nahawand, and
+**1 bayati** phrase, and only 3 of 48 phrases are 16-beat. Bayati and 16-beat
+lines usually fall back or get no seed. The corpus is AI-generated (Suno,
+transcribed with SheetSage2), so a seed is a starting contour, not a quality
+guarantee. Phase 6 (does seeding help?) was not run in this environment; seeds
+therefore stay off by default.
+
 ## Tests
 
 ```bash
-ABC2MIDI=/path/to/abc2midi python3 tests/test_roundtrip.py
+ABC2MIDI=/path/to/abc2midi python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
 The tests cover Arabic syllabification and sadr/ajuz roles, the unvocalized
 fallback, a full compile/validate round trip, the report `line_map`,
 bar-sum/chord/syllable rejection, craft separation on the four reference
-scores, and a miner smoke test.
+scores, a miner smoke test, novelty positive/negative/missing/corrupt
+controls, and the seed budget, schema guard, and 16-beat rule.
 
 ## Files
 
 - `SKILL.md` — the workflow the model follows.
 - `references/blueprint_schema.md` — full Blueprint schema, `line_map`, and error codes.
 - `references/vocal_craft.md` — prosody, phrase, cadence, motif, register rules.
-- `references/corpus.md` — corpus percentiles, forms, chord loops, riffs.
+- `references/corpus.md` — corpus percentiles, forms, chord loops, riffs, dedup note.
 - `assets/craft_thresholds.json` — provisional craft thresholds and calibration.
 - `assets/example_*` — a working 30-bar example (prompt, intake, skeleton, Blueprint, ABC).
-- `tests/fixtures/` — the one good and three defective reference scores.
+- `assets/phrase_bank.json` — 48 optional 8/16-beat vocal phrases (`phrase_bank/2`).
+- `assets/corpus_fingerprints.bin` — bottom-256 novelty sketch (630 KB, threshold 0.08).
+- `assets/corpus_profile.dedup.candidate.json` — deduped profile candidate, inspection only.
+- `assets/PROVENANCE.md` — abcsim tag/commit, source corpus, SHA-256 for every asset.
+- `scripts/novelty_check.py` — stdlib-only advisory novelty check.
+- `tests/fixtures/` — the one good and three defective reference scores, plus the `suno-0100.abc` novelty control.

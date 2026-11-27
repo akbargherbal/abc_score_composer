@@ -1,5 +1,83 @@
 # Changelog
 
+## 0.2.3
+
+### Added (all optional; no mandatory reading added)
+
+- `assets/phrase_bank.json`: 48 real vocal phrases (`schema: "phrase_bank/2"`,
+  34,788 B) from the deduped 599-song SheetSage2 corpus, in the Blueprint
+  tonic-relative `degree:beats` grammar. All 48 fit `phrase_bytes <= 130`
+  (45 x 8-beat, 3 x 16-beat). `intake_lyrics.py --seeds N` (default `0`, cap 3)
+  prints at most three matching 8-beat seeds in a <= 400 B block, with no source
+  key and no change to `intake.json` or the skeleton. Read by a script, not by
+  the agent.
+- `scripts/novelty_check.py`: stdlib-only advisory check for how close a
+  compiled melody is to the deduped corpus. `validate_and_inspect.py` calls it
+  in-process inside `try/except`; a missing asset, corrupt bank, or any
+  exception is skipped silently with `novelty: null`. The compact card prints
+  `NOVELTY` only when `status=close` (66 B in the example); `--verbose` always
+  prints it; `--json` gains a `novelty` key. Advisory only: it never changes
+  `ok` and never triggers a rewrite.
+- `assets/corpus_fingerprints.bin`: 8-token novelty hashes for 596 deduped
+  representatives (`bottom-256` sketch, 150,037 hashes, 630,382 B, stamped
+  threshold `0.08`).
+- `assets/PROVENANCE.md`: abcsim tag/commit (`handoff-0.2.3-r3`,
+  `91a999f`), the AI-generated Suno/SheetSage2 source corpus, and SHA-256 for
+  every imported file.
+- `tests/test_integration.py` and `tests/prompts/`: novelty
+  positive/negative/missing/corrupt controls, seed budget/schema/16-beat
+  tests, asset-size checks, and card-word parity.
+
+### Changed
+
+- `intake_lyrics.py` gains `--seeds N` and `--phrase-bank PATH`. With the flag
+  absent or `0`, output is byte-identical to 0.2.2.
+- `validate_and_inspect.py` prints the advisory novelty line after the CRAFT
+  lines. `--novelty-bank` overrides the bank path for tests.
+- Version 0.2.3 in `VERSION`, `SKILL.md`, and
+  `assets/craft_thresholds.json`. `SKILL.md` grows 5,824 -> 5,945 B (+121 B,
+  one `NOVELTY` line; the +150 B cap holds). The seed flag is **not**
+  documented in `SKILL.md` because Phase 6 was not run.
+
+### Candidate, not adopted
+
+- `assets/corpus_profile.dedup.candidate.json` is the profile mined from the
+  deduped corpus. The largest percentile shift is 3.6% of the full-corpus IQR
+  (adoption threshold 10%), so `assets/corpus_profile.json` stays unchanged.
+  The candidate is included only for inspection.
+
+### Coverage and known limits
+
+- Seeds are practical for 8-beat lines only. Only 3 of 48 phrases are 16-beat,
+  so a 16-beat shatr gets no seed rather than a mismatched one.
+- Mode coverage is uneven: nahawand 15, kurd 8, hijaz 8, rast 8, minor-like 6,
+  major 2, **bayati 1**. Bayati lines usually fall back to `mode=any`.
+- `role_hint` is inferred; selection filters on `cadence_class`. Degrees are
+  tonic-relative and no source key is printed.
+- Novelty controls: exact corpus copy `1.000` close; one vocal bar changed
+  `0.981` close; all notes +2 semitones `0.630` close; `example_song.abc`
+  `0.000` ok. The check is advisory, not a plagiarism verdict. abcsim reports
+  45 of 47 duplicate pairs caught and an unrelated whole-bank maximum of
+  `0.064` against the `0.08` threshold, so the margin is thin.
+- Phase 6 (does seeding improve generation?) was not run in this environment.
+  Per the pre-registered rule, seeds stay off by default and the flag is not in
+  `SKILL.md`. See `docs/seed_eval_0.2.3.md`.
+
+### Footprint (measured 2026-11-27)
+
+- `SKILL.md`: 5,945 B (from 5,824 B, +121 B).
+- Mandatory reading: 26,605 B (from 26,484 B; the only growth is the SKILL.md
+  line). The new assets are script-read and not in `mandatory_files()`.
+- Example: 1,352 B skeleton + 1,241 B fill; 30 bars; 27.2 B/bar.
+- Compact card: 13 words on success, 32 on failure (unchanged).
+- Largest seed block: 343 B across `tests/sample_prompt.txt`,
+  `assets/example_prompt.txt`, and `tests/prompts/*.txt` (cap 400 B).
+- Novelty line: 66 B in verbose; zero words on a compact `ok` card.
+- Package zip: 712,520 B (from 80,391 B, about 8.9x; the 630 KB fingerprint
+  bank does not compress).
+- Tests: 32 pass, 0 skipped with abc2midi and the corpus present; 13 pass,
+  1 skipped (miner, corpus absent) in a bare checkout.
+
 ## 0.2.2
 
 - The agent now writes only `fill.json`: a compact `meta`/`motifs` plus one

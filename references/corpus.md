@@ -2,6 +2,16 @@
 
 Mined from the 670 SheetSage2 files. Empty-vocal files are excluded from vocal statistics; off-meter bars are ignored for phrase lengths. The corpus has **no `w:` lyrics**, so melisma cannot be benchmarked from it.
 
+## Deduplication (0.2.3)
+
+abcsim removed 71 near-duplicate files before mining the phrase and
+fingerprint banks, keeping 599 songs (596 with a usable vocal). The percentile
+bands are essentially unchanged: the largest shift is 3.6% of the full-corpus
+IQR, below the 10% adoption threshold. `assets/corpus_profile.json` is
+therefore unchanged and still describes the full 670-file set. The deduped
+candidate is shipped only as `assets/corpus_profile.dedup.candidate.json` for
+inspection; do not swap it in without recording the change.
+
 - Files: 670; used for vocal stats: 644; empty vocal: 26; empty Ins: 1.
 - Non-dominant-meter bars: 1228; isolated 1-2 bar meter runs: 1126. The latter are the likely beat-tracking slips the brief says to ignore; the rest are intentional section changes (usually 2/4).
 
