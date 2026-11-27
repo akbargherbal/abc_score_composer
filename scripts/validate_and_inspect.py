@@ -28,7 +28,7 @@ from abc_common import (  # noqa: E402
     bar_has_notes, bar_rest_beats, bar_total_beats, dump_json, load_json,
     midi_to_name, parse_abc, scan_unrepresentable, targets_edited,
 )
-from craft_checks import analyse_craft, load_thresholds  # noqa: E402
+from craft_checks import analyse_craft, analyse_variety, load_thresholds  # noqa: E402
 
 
 # Pitch classes relative to the tonic for a 12-tone approximation of each maqam.
@@ -323,8 +323,10 @@ def build_report(abc_path: str, validation: str | None, report_path: str | None,
     # own source-line breaks.
     craft_path = craft_thresholds_path or os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "..", "assets", "craft_thresholds.json")
-    craft = analyse_craft(v_bars, sections, hdr["key"], comp_report,
-                          load_thresholds(craft_path))
+    craft_th = load_thresholds(craft_path)
+    craft = analyse_craft(v_bars, sections, hdr["key"], comp_report, craft_th)
+    # Variety signals: flags only, never part of ok/hard_fail or the craft gate.
+    variety = analyse_variety(v_bars, i_bars, sections, hdr["key"], comp_report, craft_th)
 
     # If the file has no compiler report, a modal key still tells us the
     # intended family.  Dphr is the ABC spelling of the Kurd/Phrygian scale.
@@ -536,6 +538,8 @@ def build_report(abc_path: str, validation: str | None, report_path: str | None,
     if strict and targets.get("craft") and craft.get("flags"):
         hard_fail = True
 
+    metrics["variety"] = variety["metrics"]
+    metrics["variety_flags"] = variety["flags"]
     metrics["errors"] = errors
     metrics["warnings"] = warnings
     metrics["flags"] = flags
@@ -566,11 +570,12 @@ def print_compact(m: dict, path: str) -> None:
     errors = m.get("errors") or []
     warnings = m.get("warnings") or []
     target_flags = [f for f in (m.get("flags") or []) if "corpus" not in f]
+    vflags = m.get("variety_flags") or []
     am = m.get("abc2midi") or {}
     nov = m.get("novelty") or {}
     # Compact cards stay quiet unless the score is close to the corpus.
     nov_line = nov.get("line") if nov.get("status") == "close" else None
-    if m.get("ok") and not cflags and not target_flags:
+    if m.get("ok") and not cflags and not target_flags and not vflags:
         midi = ("abc2midi OK" if am.get("available") and not errors and not warnings
                 else f"abc2midi {len(errors)} errors, {len(warnings)} warnings")
         print(f"OK {m['bars']} bars {m['meter']} {m['key']} {m['tempo']} BPM "
@@ -594,6 +599,8 @@ def print_compact(m: dict, path: str) -> None:
         print("CRAFT FLAGS " + "; ".join(cflags[:8]))
     if target_flags:
         print("TARGET FLAGS " + "; ".join(target_flags[:8]))
+    if vflags:
+        print("VARIETY FLAGS " + "; ".join(vflags[:4]))
     if nov_line:
         print(nov_line)
 
@@ -653,6 +660,16 @@ def print_verbose(m: dict, path: str) -> None:
               f"breath-misses {cm.get('breath_misses')}  "
               f"cadence-misses {cm.get('cadence_misses')}")
         print("CRAFT FLAGS " + "; ".join(craft["flags"][:8]) if craft.get("flags") else "CRAFT OK")
+    var = m.get("variety") or {}
+    if var:
+        rv = " ".join(f"{k} {v['ratio']:.2f}" for k, v in (var.get("rhythm_variety") or {}).items())
+        co = " ".join(f"{k} {v['mean']:.2f}" for k, v in (var.get("contour_overlap") or {}).items())
+        cv = var.get("cadence_variety") or {}
+        print(f"VARIETY rhythm {rv or 'n/a'}  contour-overlap {co or 'n/a'}  "
+              f"cadence {cv.get('distinct', 'n/a')} distinct (top share {cv.get('top_share', 'n/a')})  "
+              f"ins {var.get('ins_variety')}  chords {var.get('chord_variety')}")
+    if m.get("variety_flags"):
+        print("VARIETY FLAGS " + "; ".join(m["variety_flags"][:6]))
     if m["flags"]:
         print("FLAGS " + "; ".join(m["flags"][:10]))
     if m["diagnostics"]:

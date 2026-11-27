@@ -25,6 +25,12 @@
     "breath_rest_min": 0.5,
     "phrase_break_beats": 1.5,
     "min_phrase_notes": 2,
-    "verse_register_range_min": 12
+    "verse_register_range_min": 12,
+    "rhythm_variety_min": 0.20,
+    "contour_overlap_max": 0.80
+  },
+  "variety": {
+    "provisional": true,
+    "calibration": "uncalibrated"
   }
 }
