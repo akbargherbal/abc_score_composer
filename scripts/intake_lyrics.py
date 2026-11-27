@@ -19,6 +19,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -49,6 +50,20 @@ MAQAM_TONIC = {
     "bayati": ("D", "m"), "saba": ("D", "m"), "huzam": ("E", "m"),
     "rast": ("C", ""), "ajam": ("Bb", ""), "jiharkah": ("F", ""),
 }
+
+# Optional phrase seeds.  The bank is read by this script, never pasted into
+# the agent's context.  Seeds only add stdout lines; they never touch the
+# intake JSON or the skeleton.
+MAQAM_MODE_HINT = {
+    "kurd": "kurd-like",
+    "hijaz": "hijaz-like",
+    "rast": "rast-like",
+    "nahawand": "nahawand-like",
+    "bayati": "bayati-like",
+}
+SEED_MAX_BYTES = 400
+SEED_MAX_PHRASES = 3
+SEED_MAX_PHRASE_BYTES = 130
 
 KIND_MAP = {
     "intro": "intro", "opening": "intro",
@@ -242,6 +257,95 @@ def est_bars_for(syllables: int, tempo: int | None = None, role: str | None = No
     return 2 if syllables <= 8 else 4
 
 
+def load_phrase_bank(path: str) -> dict | None:
+    """Load a phrase_bank/2 file, or None on any failure (skip silently)."""
+    try:
+        bank = load_json(path)
+    except Exception:
+        return None
+    if not isinstance(bank, dict) or bank.get("schema") != "phrase_bank/2":
+        return None
+    if not isinstance(bank.get("phrases"), list):
+        return None
+    return bank
+
+
+def _stable_choice(candidates: list[dict], line_id: str) -> dict | None:
+    """Deterministic pick: sort by id, then a stable hash of the line id."""
+    candidates = sorted(candidates, key=lambda p: str(p.get("id")))
+    if not candidates:
+        return None
+    digest = hashlib.sha256(line_id.encode("utf-8")).digest()
+    return candidates[int.from_bytes(digest[:8], "big") % len(candidates)]
+
+
+def seed_for_line(rec: dict, phrases: list[dict],
+                  maqam: str | None) -> tuple[dict, bool] | None:
+    """Pick one optional seed for a lyric line, or None.
+
+    Returns (phrase, mode_any).  Only 8-beat lines are seeded: the bank has 45
+    eight-beat phrases and 3 sixteen-beat ones, and a 16-beat shatr must not be
+    offered a mismatched 8-beat phrase.  The budget is bars x 4 because the
+    skeleton is 4/4.
+    """
+    role = rec.get("role")
+    budget = int(rec.get("est_bars") or 0) * 4
+    if budget != 8:
+        return None
+    candidates = [
+        p for p in phrases
+        if p.get("cadence_class") == role
+        and int(p.get("beats") or 0) == budget
+        and p.get("fits_seed_budget", True)
+        and int(p.get("phrase_bytes") or 0) <= SEED_MAX_PHRASE_BYTES
+    ]
+    if not candidates:
+        return None
+    mode_hint = MAQAM_MODE_HINT.get((maqam or "").lower())
+    mode_any = False
+    if mode_hint:
+        matched = [p for p in candidates if p.get("mode_hint") == mode_hint]
+        if matched:
+            candidates = matched
+        else:
+            mode_any = True
+    else:
+        mode_any = True
+    preferred = [p for p in candidates if p.get("register") in ("mid", "high")]
+    if preferred:
+        candidates = preferred
+    phrase = _stable_choice(candidates, str(rec.get("id")))
+    if phrase is None:
+        return None
+    return phrase, mode_any
+
+
+def build_seed_block(out: dict, phrases: list[dict], limit: int) -> list[str]:
+    """At most `limit` (cap 3) SEED lines, whole block <= 400 UTF-8 bytes."""
+    limit = max(0, min(int(limit), SEED_MAX_PHRASES))
+    if not limit or not phrases:
+        return []
+    maqam = ((out.get("style") or {}).get("maqam") or "").lower()
+    lines: list[str] = []
+    total = 0
+    for rec in out.get("lines") or []:
+        if len(lines) >= limit:
+            break
+        got = seed_for_line(rec, phrases, maqam)
+        if not got:
+            continue
+        phrase, mode_any = got
+        tag = " mode=any" if mode_any else ""
+        line = (f"SEED {phrase['id']} {rec['role']} {int(phrase['beats'])}b"
+                f"{tag} {phrase['phrase']}")
+        size = len(line.encode("utf-8")) + 1
+        if total + size > SEED_MAX_BYTES:
+            break
+        lines.append(line)
+        total += size
+    return lines
+
+
 def _chord_root(degree: str, key_info: dict) -> str:
     midi, _letter, _norm = degree_to_midi(degree, key_info)
     name = midi_to_name(midi, prefer_flats=key_info["prefer_flats"])
@@ -358,6 +462,10 @@ def main() -> int:
     ap.add_argument("--skeleton", default=None,
                     help="write the mechanical Blueprint skeleton here "
                          "(default: blueprint_skeleton.json beside -o)")
+    ap.add_argument("--seeds", type=int, default=0,
+                    help="print at most N optional phrase seeds (0=off, cap 3)")
+    ap.add_argument("--phrase-bank", default=None,
+                    help="phrase_bank.json (default: ../assets/phrase_bank.json)")
     ap.add_argument("--json", action="store_true", help="print full JSON to stdout")
     ap.add_argument("--pretty", action="store_true")
     args = ap.parse_args()
@@ -548,6 +656,14 @@ def main() -> int:
               f"onsets/beat p50={reference['onsets_per_beat_p50']}  "
               f"lift p50={reference['chorus_lift_p50']}")
         print("  section p50: " + ", ".join(f"{k} {v}" for k, v in reference["section_lengths_p50"].items()))
+    if args.seeds > 0:
+        bank_path = args.phrase_bank or os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "..", "assets",
+            "phrase_bank.json")
+        bank = load_phrase_bank(bank_path)
+        if bank:
+            for line in build_seed_block(out, bank.get("phrases") or [], args.seeds):
+                print(line)
     return 0
 
 
