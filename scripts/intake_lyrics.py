@@ -73,6 +73,7 @@ KIND_MAP = {
     "bridge": "bridge",
     "pre-chorus": "pre-chorus", "prechorus": "pre-chorus", "pre chorus": "pre-chorus",
     "outro": "outro", "ending": "outro", "coda": "outro",
+    "end": "outro", "the end": "outro", "finale": "outro",
     "silence": "silence",
 }
 
@@ -234,7 +235,8 @@ def slugify(name: str) -> str:
     return s or "section"
 
 
-def normalize_kind(name: str) -> str:
+def known_kind(name: str) -> str | None:
+    """Section kind for a recognised header name, or None if unknown."""
     low = name.lower().strip()
     for key, kind in KIND_MAP.items():
         if low == key or low.startswith(key + " ") or low.startswith(key + "-"):
@@ -243,7 +245,11 @@ def normalize_kind(name: str) -> str:
         return "verse"
     if low.startswith("chorus"):
         return "chorus"
-    return "verse"
+    return None
+
+
+def normalize_kind(name: str) -> str:
+    return known_kind(name) or "verse"
 
 
 def est_bars_for(syllables: int, tempo: int | None = None, role: str | None = None) -> int:
@@ -511,6 +517,7 @@ def main() -> int:
             "name": name.strip(),
             "key": key,
             "kind": normalize_kind(name),
+            "_unknown_kind": known_kind(name) is None,
             "cues": (cues or "").strip(),
             "lines": [],
             "couplets": 0,
@@ -559,6 +566,13 @@ def main() -> int:
         current["syllables"] += count
         current["est_bars"] += rec["est_bars"]
         line_records.append(rec)
+
+    # An unknown header with no lyric lines (e.g. [End], [Fin]) is not a
+    # verse: the compiler would demand whole bayts of it.  Last -> outro,
+    # otherwise interlude.  Sections with lyric lines keep the verse default.
+    for pos, sec in enumerate(sections):
+        if sec.pop("_unknown_kind", False) and not sec["lines"]:
+            sec["kind"] = "outro" if pos == len(sections) - 1 else "interlude"
 
     for sec in sections:
         sec["line_count"] = len(sec["lines"])
