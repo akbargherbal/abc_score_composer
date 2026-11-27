@@ -27,7 +27,19 @@ units. Pitches are **scale degrees**, not note letters.
 | `vocal_range` | no | `[low, high]` MIDI, default `[48, 84]`. |
 | `instrument_range` | no | `[low, high]` MIDI, default `[36, 96]`. |
 | `title` | no | Optional label for `notes.md`; the delivered ABC keeps `T:` empty like the corpus. |
-| `targets` | no | Musical targets the inspector checks: `melisma`, `chorus_lift`, `call_response`, `vocal_span`, `max_phrase_seconds`, `dominant_duration`, `maqam_fit`. Set `craft: true` to turn craft flags into a hard failure under `--strict`. |
+| `targets` | no | Defaults come from the skeleton; table below. **Do not edit targets; if one cannot be met, report it.** An edited or added target prints `TARGET edited`. `craft: true` turns craft flags into a hard failure under `--strict`. |
+
+Targets (cap: stay at or under; goal: reach or exceed):
+
+| Target | Kind | Default | Provenance |
+|---|---|---|---|
+| `vocal_span` | cap | 20 | corpus p90 |
+| `max_phrase_seconds` | cap | 12 | heuristic |
+| `chorus_lift` | goal | 3 | corpus p75 |
+| `call_response` | goal | 0.6 | heuristic (corpus `ins_in_vocal_gaps` p10 is 0.74) |
+| `maqam_fit` | goal | 0.8 | heuristic |
+| `melisma` | goal | none | no corpus baseline (no lyrics); shown, never flagged unless set |
+| `dominant_duration` | cap | none | heuristic; unset by default |
 
 ### A section
 

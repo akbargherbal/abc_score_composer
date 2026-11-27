@@ -28,7 +28,7 @@ import unicodedata
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from abc_common import (  # noqa: E402
-    degree_to_midi, load_json, midi_to_name, parse_key,
+    DEFAULT_TARGETS, degree_to_midi, load_json, midi_to_name, parse_key,
 )
 
 # Arabic short vowels and related marks.
@@ -397,14 +397,7 @@ def build_skeleton(out: dict) -> dict:
         "meter": "4/4",
         "tempo": style.get("tempo_default") or style.get("tempo_hint") or 90,
         "vocal_octave": 0,
-        "targets": {
-            "melisma": 1.2,
-            "chorus_lift": 3,
-            "call_response": 0.6,
-            "vocal_span": 20,
-            "max_phrase_seconds": 12,
-            "maqam_fit": 0.8,
-        },
+        "targets": dict(DEFAULT_TARGETS),
     }
     if meta["maqam"] is None:
         meta.pop("maqam")

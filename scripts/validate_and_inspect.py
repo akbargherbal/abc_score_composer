@@ -26,7 +26,7 @@ from statistics import median
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from abc_common import (  # noqa: E402
     bar_has_notes, bar_rest_beats, bar_total_beats, dump_json, load_json,
-    midi_to_name, parse_abc, scan_unrepresentable,
+    midi_to_name, parse_abc, scan_unrepresentable, targets_edited,
 )
 from craft_checks import analyse_craft, load_thresholds  # noqa: E402
 
@@ -438,6 +438,14 @@ def build_report(abc_path: str, validation: str | None, report_path: str | None,
                 flags.append(f"{key} {value:.2f} is {word} the corpus p10-p90 band")
             else:
                 flags.append(f"{key} {value} is {word} the corpus band")
+
+    # Tamper evidence: a target that differs from DEFAULT_TARGETS, or was
+    # added, is named.  Edited targets are still honoured below.
+    edited = targets_edited(targets)
+    metrics["targets_edited"] = edited
+    for item in edited:
+        old_v = "none" if item["default"] is None else item["default"]
+        flags.append(f"TARGET edited: {item['key']} {old_v} -> {item['value']}")
 
     if targets:
         if "melisma" in targets and melisma:

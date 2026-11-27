@@ -236,6 +236,36 @@ def pct_block(values) -> dict:
     }
 
 
+# Default Blueprint targets: the single source of truth.  The skeleton writes
+# them; the inspector compares meta.targets against them to make an edit
+# visible.  `melisma` is deliberately absent: the corpus has no lyrics
+# (references/corpus.md), so any number would be invented.  An author may still
+# set it explicitly.
+DEFAULT_TARGETS = {
+    "chorus_lift": 3,
+    "call_response": 0.6,
+    "vocal_span": 20,
+    "max_phrase_seconds": 12,
+    "maqam_fit": 0.8,
+}
+
+
+def targets_edited(targets: dict | None) -> list[dict]:
+    """Keys of `targets` that differ from, or are missing in, DEFAULT_TARGETS.
+
+    `craft` is a gate switch, not a target value, and is not compared.
+    """
+    out = []
+    for key, value in (targets or {}).items():
+        if key == "craft":
+            continue
+        if key not in DEFAULT_TARGETS:
+            out.append({"key": key, "default": None, "value": value})
+        elif DEFAULT_TARGETS[key] != value:
+            out.append({"key": key, "default": DEFAULT_TARGETS[key], "value": value})
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Representable durations (abcjs parity)
 # ---------------------------------------------------------------------------
