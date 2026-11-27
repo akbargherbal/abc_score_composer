@@ -32,3 +32,4 @@ shipped. Both still render with abc2midi without errors.
   `close` as "look at this", never as a plagiarism verdict.
 - **Compact output is silent unless `status=close`.** `status=ok` adds zero
   words to the success card; verbose mode always prints the line.
+- **NOVELTY sees the Vocal voice only.** It compares the Vocal voice to the corpus; it does not see chord symbols, the Ins voice, form, or other sessions, so two scores can share backing and structure while NOVELTY reports `none`.

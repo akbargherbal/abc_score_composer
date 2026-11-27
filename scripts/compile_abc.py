@@ -1120,6 +1120,8 @@ def main() -> int:
                     help="require syl on every vocal bar")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--pretty", action="store_true")
+    ap.add_argument("--verbose", action="store_true",
+                    help="also print the authoring-cost line (fill bytes vs ABC bytes)")
     args = ap.parse_args()
 
     try:
@@ -1159,6 +1161,15 @@ def main() -> int:
         with open(args.validation_out, "w", encoding="utf-8") as f:
             f.write(result["validation_abc"])
     report = result["report"]
+    # Authoring-cost proxy: thinking text is not visible from outside, but the
+    # bytes the author wrote (the fill, or the full Blueprint) against the ABC
+    # it produced are.  Compact card output is unchanged; see --verbose.
+    authored = args.fill or args.blueprint
+    fill_bytes = os.path.getsize(authored)
+    abc_bytes = len(result["abc"].encode("utf-8"))
+    report["fill_bytes"] = fill_bytes
+    report["abc_bytes"] = abc_bytes
+    report["fill_to_abc_ratio"] = round(fill_bytes / abc_bytes, 3) if abc_bytes else None
     if args.report:
         dump_json(report, args.report, pretty=True)
 
@@ -1175,6 +1186,9 @@ def main() -> int:
         if r["warnings"]:
             for w in r["warnings"][:8]:
                 print(f"warn {w['code']}: {w['msg']}")
+        if args.verbose:
+            print(f"cost fill {r['fill_bytes']} B -> abc {r['abc_bytes']} B "
+                  f"(ratio {r['fill_to_abc_ratio']})")
     return 0
 
 

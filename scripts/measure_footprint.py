@@ -264,6 +264,9 @@ def measure(root: str, label: str, binary: str | None) -> dict:
     skel_path = os.path.join(root, "assets", "example_blueprint_skeleton.json")
     agent_bytes = size(agent_path)
     skeleton_bytes = size(skel_path)
+    # 0.2.4: authoring-cost proxy for the shipped example (fill bytes / ABC bytes).
+    example_abc_bytes = size(os.path.join(root, "assets", "example_song.abc"))
+    fill_abc_ratio = round(agent_bytes / example_abc_bytes, 3) if example_abc_bytes else None
 
     tmp = tempfile.mkdtemp(prefix="abc_footprint_")
     try:
@@ -289,6 +292,8 @@ def measure(root: str, label: str, binary: str | None) -> dict:
         "agent_write_bytes": agent_bytes,
         "agent_write_file": os.path.relpath(agent_path, root),
         "skeleton_bytes": skeleton_bytes,
+        "example_abc_bytes": example_abc_bytes,
+        "fill_to_abc_ratio": fill_abc_ratio,
         "agent_payload_bytes_per_bar": round(payload, 1),
         "card_ok_words": card_ok,
         "card_fail_words": card_fail,
@@ -319,7 +324,7 @@ def main() -> int:
     print(f"{'label':10s} {'skill_B':>8s} {'skill_W':>8s} {'mand_B':>8s} "
           f"{'mand_W':>8s} {'bp_B':>7s} {'skel_B':>7s} {'agent_B':>7s} "
           f"{'bars':>5s} {'B/bar':>7s} {'ok_W':>6s} {'fail_W':>7s} "
-          f"{'seed_B':>7s} {'nov_B':>6s} {'zip_B':>8s}")
+          f"{'seed_B':>7s} {'nov_B':>6s} {'zip_B':>8s} {'abc_B':>6s} {'f/abc':>6s}")
     print(f"{data['label']:10s} {data['skill_bytes']:8d} {data['skill_words']:8d} "
           f"{data['mandatory_bytes']:8d} {data['mandatory_words']:8d} "
           f"{data['blueprint_bytes']:7d} {data['skeleton_bytes']:7d} "
@@ -327,7 +332,8 @@ def main() -> int:
           f"{data['agent_payload_bytes_per_bar']:7.1f} "
           f"{data['card_ok_words']:6d} {data['card_fail_words']:7d} "
           f"{data['seed_block_B']:7d} {data['novelty_line_B']:6d} "
-          f"{data['package_zip_B']:8d}")
+          f"{data['package_zip_B']:8d} {data['example_abc_bytes']:6d} "
+          f"{(data['fill_to_abc_ratio'] or 0):6.2f}")
     if not guard_ok:
         print(f"GUARD FAIL: mandatory reading {data['mandatory_bytes']} B exceeds "
               f"the 0.2.3 baseline {BASELINE_0_2_3_MANDATORY_BYTES} B by more "
